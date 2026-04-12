@@ -26,6 +26,11 @@
   .input-row button:hover { opacity:0.85; }
   .input-row button:disabled { opacity:0.4; cursor:not-allowed; }
 
+  .api-key-bar { display:flex; gap:8px; align-items:center; margin-top:10px; }
+  .api-key-bar input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:8px 12px; font-family:var(--mono); font-size:12px; color:var(--text); outline:none; transition:border-color 0.2s; }
+  .api-key-bar input:focus { border-color:var(--accent); }
+  .api-key-bar input::placeholder { color:var(--muted); }
+  .key-ok { font-family:var(--mono); font-size:11px; color:var(--green); white-space:nowrap; display:none; }
   .chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
   .chip { font-family:var(--mono); font-size:11px; letter-spacing:0.08em; padding:5px 12px; border-radius:4px; border:1px solid var(--border); color:var(--muted); cursor:pointer; transition:all 0.15s; background:none; }
   .chip:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
@@ -84,6 +89,10 @@
     <button id="btn" onclick="analyze()">Analyser</button>
   </div>
 
+  <div class="api-key-bar">
+    <input type="password" id="apiKey" placeholder="Clé API OpenAI  sk-…" oninput="onKeyInput()"/>
+    <span class="key-ok" id="keyOk">✓ clé enregistrée</span>
+  </div>
   <div class="chips">
     <button class="chip" onclick="setTicker('AAPL')">AAPL</button>
     <button class="chip" onclick="setTicker('TSLA')">TSLA</button>
@@ -104,10 +113,20 @@
 <script>
 const WEBHOOK   = 'https://hook.eu1.make.com/1mlw60agtu0lw22kupuqvxa6jfwsx1oa/';
 const WF_ID     = 'wf_69dbc9be19f48190856edbcf2db23c0a0b1f3769adf717f9';
-const OAI_KEY   = 'VOTRE_CLE_API_ICI';
-let lastData    = null;
+let lastData = null;
 
-function getKey() { return OAI_KEY; }
+window.addEventListener('DOMContentLoaded', () => {
+  const k = sessionStorage.getItem('oai_key');
+  if (k) { document.getElementById('apiKey').value = k; document.getElementById('keyOk').style.display = 'inline'; }
+});
+
+function onKeyInput() {
+  const v = document.getElementById('apiKey').value.trim();
+  if (v) sessionStorage.setItem('oai_key', v);
+  document.getElementById('keyOk').style.display = v ? 'inline' : 'none';
+}
+
+function getKey() { return document.getElementById('apiKey').value.trim(); }
 function setTicker(s) { document.getElementById('ticker').value = s; analyze(); }
 document.getElementById('ticker').addEventListener('keydown', e => { if (e.key==='Enter') analyze(); });
 
@@ -191,7 +210,7 @@ function render(d) {
       <div class="ai-text" id="aiText"></div>
     </div>`;
   document.getElementById('card').style.display='block';
-  document.getElementById('aiBtnWrap').style.display='block';
+  document.getElementById('aiBtnWrap').style.display=getKey()?'block':'none';
 }
 
 /* ── Agent OpenAI ── */
