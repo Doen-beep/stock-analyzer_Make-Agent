@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f; --surface: #111118; --border: #1e1e2e;
+    --accent: #7c6af7; --accent-dim: rgba(124,106,247,0.12);
+    --green: #22d3a0; --red: #f05a5a; --text: #e8e6f0; --muted: #6b6880;
+    --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:48px 24px; }
+  header { text-align:center; margin-bottom:48px; }
+  header h1 { font-family:var(--mono); font-size:13px; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:16px; }
+  header p { font-size:13px; color:var(--muted); }
+  .search-box { width:100%; max-width:560px; margin-bottom:32px; }
+  .input-row { display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; background:var(--surface); transition:border-color 0.2s; }
+  .input-row:focus-within { border-color:var(--accent); }
+  .input-row input { flex:1; background:none; border:none; outline:none; padding:14px 18px; font-family:var(--mono); font-size:18px; font-weight:500; color:var(--text); text-transform:uppercase; letter-spacing:0.08em; }
+  .input-row input::placeholder { color:var(--muted); font-weight:400; font-size:14px; letter-spacing:0.04em; text-transform:none; }
+  .input-row button { background:var(--accent); border:none; padding:14px 24px; cursor:pointer; font-family:var(--mono); font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:#fff; transition:opacity 0.15s; }
+  .input-row button:hover { opacity:0.85; }
+  .input-row button:disabled { opacity:0.4; cursor:not-allowed; }
+
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .chip { font-family:var(--mono); font-size:11px; letter-spacing:0.08em; padding:5px 12px; border-radius:4px; border:1px solid var(--border); color:var(--muted); cursor:pointer; transition:all 0.15s; background:none; }
+  .chip:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
+  .status { width:100%; max-width:560px; font-family:var(--mono); font-size:12px; color:var(--muted); margin-bottom:16px; min-height:18px; letter-spacing:0.04em; }
+  .status.loading::before { content:''; display:inline-block; width:8px; height:8px; border:1.5px solid var(--accent); border-top-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; margin-right:8px; vertical-align:middle; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .card { width:100%; max-width:560px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; display:none; animation:fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .card-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-end; }
+  .ticker-name h2 { font-family:var(--mono); font-size:22px; font-weight:500; letter-spacing:0.04em; }
+  .ticker-name p { font-size:13px; color:var(--muted); margin-top:2px; }
+  .price-block { text-align:right; }
+  .price-block .price { font-family:var(--mono); font-size:26px; font-weight:500; }
+  .price-block .change { font-family:var(--mono); font-size:12px; margin-top:2px; }
+  .up { color:var(--green); } .down { color:var(--red); }
+  .rec-badge { display:inline-block; font-family:var(--mono); font-size:10px; letter-spacing:0.1em; padding:3px 10px; border-radius:3px; margin-top:6px; text-transform:uppercase; }
+  .rec-buy { background:rgba(34,211,160,0.12); color:var(--green); border:1px solid rgba(34,211,160,0.25); }
+  .rec-hold { background:rgba(248,196,80,0.12); color:#f8c450; border:1px solid rgba(248,196,80,0.25); }
+  .rec-sell { background:rgba(240,90,90,0.12); color:var(--red); border:1px solid rgba(240,90,90,0.25); }
+  .grid { display:grid; grid-template-columns:1fr 1fr; }
+  .section { padding:18px 24px; border-bottom:1px solid var(--border); }
+  .section:nth-child(odd) { border-right:1px solid var(--border); }
+  .section:last-child,.section:nth-last-child(2) { border-bottom:none; }
+  .section h3 { font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; font-size:13px; }
+  .row:last-child { margin-bottom:0; }
+  .row .label { color:var(--muted); }
+  .row .val { font-family:var(--mono); font-size:12px; font-weight:500; }
+  .range-bar { margin-top:10px; position:relative; height:3px; background:var(--border); border-radius:2px; }
+  .range-fill { position:absolute; height:100%; background:var(--accent); border-radius:2px; opacity:0.5; }
+  .range-dot { position:absolute; width:7px; height:7px; background:var(--accent); border-radius:50%; top:-2px; transform:translateX(-50%); }
+  .range-labels { display:flex; justify-content:space-between; margin-top:6px; font-family:var(--mono); font-size:10px; color:var(--muted); }
+  .ai-btn-wrap { padding:16px 24px; border-top:1px solid var(--border); display:none; }
+  .ai-btn { width:100%; padding:12px; background:none; border:1px solid var(--accent); border-radius:5px; cursor:pointer; font-family:var(--mono); font-size:12px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); transition:all 0.15s; }
+  .ai-btn:hover { background:var(--accent-dim); }
+  .ai-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .ai-block { border-top:1px solid var(--border); padding:20px 24px; display:none; }
+  .ai-block h3 { font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+  .ai-text { font-size:13px; line-height:1.8; color:var(--text); white-space:pre-wrap; }
+  .cursor { display:inline-block; width:2px; height:13px; background:var(--accent); margin-left:2px; vertical-align:middle; animation:blink 0.8s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .error-msg { width:100%; max-width:560px; font-family:var(--mono); font-size:12px; color:var(--red); padding:12px 16px; border:1px solid rgba(240,90,90,0.2); border-radius:6px; background:rgba(240,90,90,0.05); display:none; }
+  footer { margin-top:48px; font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.06em; text-align:center; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Stock Analyzer</h1>
+  <p>Données via Make · Analyse par OpenAI</p>
+</header>
+
+<div class="search-box">
+  <div class="input-row">
+    <input type="text" id="ticker" placeholder="Entrez un ticker…" maxlength="10"/>
+    <button id="btn" onclick="analyze()">Analyser</button>
+  </div>
+
+  <div class="chips">
+    <button class="chip" onclick="setTicker('AAPL')">AAPL</button>
+    <button class="chip" onclick="setTicker('TSLA')">TSLA</button>
+    <button class="chip" onclick="setTicker('MSFT')">MSFT</button>
+    <button class="chip" onclick="setTicker('GOOGL')">GOOGL</button>
+    <button class="chip" onclick="setTicker('NVDA')">NVDA</button>
+    <button class="chip" onclick="setTicker('AMZN')">AMZN</button>
+    <button class="chip" onclick="setTicker('META')">META</button>
+  </div>
+</div>
+
+<div class="status" id="status"></div>
+<div class="error-msg" id="error"></div>
+<div class="card" id="card"></div>
+
+<footer>Données à titre indicatif · Pas de conseil financier</footer>
+
+<script>
+const WEBHOOK   = 'https://hook.eu1.make.com/1mlw60agtu0lw22kupuqvxa6jfwsx1oa/';
+const WF_ID     = 'wf_69dbc9be19f48190856edbcf2db23c0a0b1f3769adf717f9';
+const OAI_KEY   = 'VOTRE_CLE_API_ICI';
+let lastData    = null;
+
+function getKey() { return OAI_KEY; }
+function setTicker(s) { document.getElementById('ticker').value = s; analyze(); }
+document.getElementById('ticker').addEventListener('keydown', e => { if (e.key==='Enter') analyze(); });
+
+const fmt  = (n,d=2) => n==null||isNaN(n) ? '—' : Number(n).toFixed(d);
+const fmtB = n => n==null ? '—' : (n/1e9>=1000 ? (n/1e12).toFixed(1)+' T$' : (n/1e9).toFixed(1)+' Mrd$');
+const fmtM = n => n==null ? '—' : (n/1e6).toFixed(1)+' M';
+const pct  = n => n==null ? '—' : (n>=0?'+':'')+(n*100).toFixed(2)+'%';
+const cc   = n => n==null ? '' : n>=0 ? 'up' : 'down';
+
+function recBadge(k) {
+  if (!k) return '';
+  const m={buy:['rec-buy','Achat'],hold:['rec-hold','Neutre'],sell:['rec-sell','Vente'],'strong buy':['rec-buy','Fort achat'],'strong sell':['rec-sell','Fort vente']};
+  const [c,l]=m[k]||['rec-hold',k];
+  return `<div class="rec-badge ${c}">${l}</div>`;
+}
+
+function rbar(lo,hi,cur) {
+  if (!lo||!hi||!cur) return '';
+  const p=Math.min(100,Math.max(0,((cur-lo)/(hi-lo))*100));
+  return `<div class="range-bar"><div class="range-fill" style="width:${p}%"></div><div class="range-dot" style="left:${p}%"></div></div><div class="range-labels"><span>$${fmt(lo)}</span><span>$${fmt(hi)}</span></div>`;
+}
+
+function render(d) {
+  const p=d.price||{},sd=d.summaryDetail||{},fd=d.financialData||{},ks=d.defaultKeyStatistics||{};
+  const sym=p.symbol||'—',name=p.shortName||sym,price=p.regularMarketPrice,chg=p.regularMarketChange;
+  document.getElementById('card').innerHTML=`
+    <div class="card-header">
+      <div class="ticker-name"><h2>${sym}</h2><p>${name}</p>${recBadge(fd.recommendationKey)}</div>
+      <div class="price-block">
+        <div class="price">$${fmt(price)}</div>
+        <div class="change ${cc(chg)}">${chg>=0?'+':''}${fmt(chg)} (${pct(p.regularMarketChangePercent)})</div>
+        ${p.postMarketPrice?`<div class="change ${cc(p.postMarketChange)}" style="font-size:11px;margin-top:2px">After-hours $${fmt(p.postMarketPrice)} ${p.postMarketChange>=0?'+':''}${fmt(p.postMarketChange)}</div>`:''}
+      </div>
+    </div>
+    <div class="grid">
+      <div class="section"><h3>Séance</h3>
+        <div class="row"><span class="label">Ouverture</span><span class="val">$${fmt(p.regularMarketOpen)}</span></div>
+        <div class="row"><span class="label">Volume</span><span class="val">${fmtM(p.regularMarketVolume)}</span></div>
+        <div class="row"><span class="label">Vol. moy. 3M</span><span class="val">${fmtM(sd.averageVolume)}</span></div>
+        ${rbar(p.regularMarketDayLow,p.regularMarketDayHigh,price)}
+      </div>
+      <div class="section"><h3>52 semaines</h3>
+        <div class="row"><span class="label">Plus haut</span><span class="val up">$${fmt(sd.fiftyTwoWeekHigh)}</span></div>
+        <div class="row"><span class="label">Plus bas</span><span class="val down">$${fmt(sd.fiftyTwoWeekLow)}</span></div>
+        <div class="row"><span class="label">Perf.</span><span class="val ${cc(ks['52WeekChange'])}">${pct(ks['52WeekChange'])}</span></div>
+        ${rbar(sd.fiftyTwoWeekLow,sd.fiftyTwoWeekHigh,price)}
+      </div>
+      <div class="section"><h3>Valorisation</h3>
+        <div class="row"><span class="label">Capi.</span><span class="val">${fmtB(p.marketCap)}</span></div>
+        <div class="row"><span class="label">PER trailing</span><span class="val">${fmt(sd.trailingPE)}x</span></div>
+        <div class="row"><span class="label">PER forward</span><span class="val">${fmt(sd.forwardPE)}x</span></div>
+        <div class="row"><span class="label">Prix/Livre</span><span class="val">${fmt(ks.priceToBook)}x</span></div>
+        <div class="row"><span class="label">Bêta</span><span class="val">${fmt(sd.beta)}</span></div>
+      </div>
+      <div class="section"><h3>Analystes (${fd.numberOfAnalystOpinions||'—'})</h3>
+        <div class="row"><span class="label">Recommandation</span><span class="val">${fd.recommendationKey||'—'}</span></div>
+        <div class="row"><span class="label">Objectif médian</span><span class="val">$${fmt(fd.targetMedianPrice)}</span></div>
+        <div class="row"><span class="label">Potentiel</span><span class="val ${price&&fd.targetMedianPrice&&fd.targetMedianPrice>price?'up':'down'}">${price&&fd.targetMedianPrice?pct((fd.targetMedianPrice-price)/price):'—'}</span></div>
+        <div class="row"><span class="label">Fourchette</span><span class="val">$${fmt(fd.targetLowPrice)}–$${fmt(fd.targetHighPrice)}</span></div>
+      </div>
+      <div class="section"><h3>Finances</h3>
+        <div class="row"><span class="label">CA</span><span class="val">${fmtB(fd.totalRevenue)}</span></div>
+        <div class="row"><span class="label">Croissance CA</span><span class="val ${cc(fd.revenueGrowth)}">${pct(fd.revenueGrowth)}</span></div>
+        <div class="row"><span class="label">Marge nette</span><span class="val ${cc(fd.profitMargins)}">${pct(fd.profitMargins)}</span></div>
+        <div class="row"><span class="label">Free cash-flow</span><span class="val">${fmtB(fd.freeCashflow)}</span></div>
+        <div class="row"><span class="label">Dette/FP</span><span class="val">${fmt(fd.debtToEquity)}x</span></div>
+      </div>
+      <div class="section"><h3>Dividende & actionnariat</h3>
+        <div class="row"><span class="label">Dividende</span><span class="val">$${fmt(sd.dividendRate)}/an</span></div>
+        <div class="row"><span class="label">Rendement</span><span class="val">${pct(sd.dividendYield)}</span></div>
+        <div class="row"><span class="label">EPS trailing</span><span class="val">$${fmt(ks.trailingEps)}</span></div>
+        <div class="row"><span class="label">EPS forward</span><span class="val">$${fmt(ks.forwardEps)}</span></div>
+        <div class="row"><span class="label">Institutions</span><span class="val">${pct(ks.heldPercentInstitutions)}</span></div>
+      </div>
+    </div>
+    <div class="ai-btn-wrap" id="aiBtnWrap">
+      <button class="ai-btn" id="aiBtn" onclick="aiAnalyze()">Analyser avec l'agent IA</button>
+    </div>
+    <div class="ai-block" id="aiBlock">
+      <h3>Analyse IA</h3>
+      <div class="ai-text" id="aiText"></div>
+    </div>`;
+  document.getElementById('card').style.display='block';
+  document.getElementById('aiBtnWrap').style.display='block';
+}
+
+/* ── Agent OpenAI ── */
+async function aiAnalyze() {
+  const key = getKey();
+  if (!key) { alert('Veuillez entrer votre clé API OpenAI.'); return; }
+  if (!lastData) return;
+
+  const aiBtn=document.getElementById('aiBtn'),aiBlock=document.getElementById('aiBlock'),aiText=document.getElementById('aiText');
+  aiBtn.disabled=true;
+  aiBlock.style.display='block';
+  aiText.innerHTML='<span style="color:var(--muted);font-style:italic">Analyse en cours…</span><span class="cursor"></span>';
+
+  const p=lastData.price||{},sd=lastData.summaryDetail||{},fd=lastData.financialData||{},ks=lastData.defaultKeyStatistics||{};
+
+  const userMsg=`Analyse financière de ${p.symbol} (${p.shortName||p.symbol}) — données temps réel :
+
+PRIX & MARCHÉ
+Prix : $${fmt(p.regularMarketPrice)} | Variation : ${pct(p.regularMarketChangePercent)}
+Plage 52 sem. : $${fmt(sd.fiftyTwoWeekLow)} – $${fmt(sd.fiftyTwoWeekHigh)} | Perf. : ${pct(ks['52WeekChange'])}
+Moy. 50j : $${fmt(sd.fiftyDayAverage)} | Moy. 200j : $${fmt(sd.twoHundredDayAverage)}
+Capitalisation : ${fmtB(p.marketCap)} | Bêta : ${fmt(sd.beta)}
+
+VALORISATION
+PER trailing : ${fmt(sd.trailingPE)}x | PER forward : ${fmt(sd.forwardPE)}x | Prix/Livre : ${fmt(ks.priceToBook)}x
+
+ANALYSTES (${fd.numberOfAnalystOpinions} opinions) : ${fd.recommendationKey}
+Objectif médian : $${fmt(fd.targetMedianPrice)} | Fourchette : $${fmt(fd.targetLowPrice)} – $${fmt(fd.targetHighPrice)}
+
+FINANCES
+CA : ${fmtB(fd.totalRevenue)} | Croissance : ${pct(fd.revenueGrowth)}
+Marge nette : ${pct(fd.profitMargins)} | Marge brute : ${pct(fd.grossMargins)}
+FCF : ${fmtB(fd.freeCashflow)} | ROE : ${pct(fd.returnOnEquity)} | Dette/FP : ${fmt(fd.debtToEquity)}x
+EPS : $${fmt(ks.trailingEps)} → $${fmt(ks.forwardEps)} (forward)
+Dividende : $${fmt(sd.dividendRate)}/an (${pct(sd.dividendYield)})
+
+Fournis une analyse concise en français couvrant : valorisation, santé financière, momentum technique, risques et perspectives.`;
+
+  try {
+    // Tentative avec Responses API (workflow_id)
+    const body = {
+      model: 'gpt-4o',
+      stream: true,
+      input: userMsg,
+      workflow_id: WF_ID
+    };
+
+    const res = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+key },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({}));
+      // Si workflow non supporté, fallback Chat Completions
+      if (res.status===404 || res.status===400) {
+        await chatFallback(key, userMsg, aiText);
+      } else {
+        throw new Error(err.error?.message||'HTTP '+res.status);
+      }
+      return;
+    }
+
+    await streamResponse(res, aiText);
+
+  } catch(e) {
+    aiText.innerHTML=`<span style="color:var(--red)">Erreur : ${e.message}</span>`;
+  } finally {
+    aiBtn.disabled=false;
+  }
+}
+
+async function chatFallback(key, msg, aiText) {
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+key },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      stream: true,
+      messages: [
+        { role: 'system', content: 'Tu es un analyste financier expert. Réponds en français, de façon concise et factuelle.' },
+        { role: 'user', content: msg }
+      ]
+    })
+  });
+  if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||'HTTP '+res.status); }
+  await streamResponse(res, aiText);
+}
+
+async function streamResponse(res, aiText) {
+  let text='';
+  const reader=res.body.getReader(), dec=new TextDecoder();
+  aiText.innerHTML='';
+  while(true) {
+    const {done,value}=await reader.read();
+    if(done) break;
+    for (const line of dec.decode(value,{stream:true}).split('\n')) {
+      if (!line.startsWith('data: ')) continue;
+      const raw=line.slice(6).trim();
+      if (raw==='[DONE]') break;
+      try {
+        const obj=JSON.parse(raw);
+        const delta=obj.delta?.text||obj.choices?.[0]?.delta?.content||obj.output?.[0]?.content?.[0]?.text||'';
+        if (delta) { text+=delta; aiText.innerHTML=text.replace(/\n/g,'<br>')+'<span class="cursor"></span>'; }
+      } catch{}
+    }
+  }
+  aiText.innerHTML=text.replace(/\n/g,'<br>');
+}
+
+/* ── Fetch Make ── */
+async function analyze() {
+  const ticker=document.getElementById('ticker').value.trim().toUpperCase();
+  if (!ticker) return;
+  const btn=document.getElementById('btn'),status=document.getElementById('status'),errorEl=document.getElementById('error'),card=document.getElementById('card');
+  btn.disabled=true; card.style.display='none'; errorEl.style.display='none'; lastData=null;
+  status.className='status loading'; status.textContent='Chargement de '+ticker+'…';
+  try {
+    const res=await fetch(WEBHOOK+'?symbol='+encodeURIComponent(ticker));
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    const data=json.data||json;
+    if (!data.price) throw new Error('Données invalides reçues');
+    lastData=data;
+    status.className='status'; status.textContent='✓ '+ticker+' · '+new Date().toLocaleTimeString('fr-FR');
+    render(data);
+  } catch(e) {
+    status.className='status'; status.textContent='';
+    errorEl.textContent='Erreur : '+e.message; errorEl.style.display='block';
+  } finally { btn.disabled=false; }
+}
+</script>
+</body>
+</html>
