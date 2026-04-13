@@ -1,0 +1,4 @@
+{
+  "model": "gpt-4.1-nano",
+  "instructions": "Tu es un agent de test. Affiche les données reçues et indique si elle conviennent pour faire une analyse à la Warren Buffet✓"
+}
