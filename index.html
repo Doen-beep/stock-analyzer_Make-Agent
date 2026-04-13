@@ -232,7 +232,7 @@ FCF : ${fmtB(fd.freeCashflow)} | ROE : ${pct(fd.returnOnEquity)} | Dette/FP : ${
 EPS : $${fmt(ks.trailingEps)} → $${fmt(ks.forwardEps)} (forward)
 Dividende : $${fmt(sd.dividendRate)}/an (${pct(sd.dividendYield)})
 
-Fournis une analyse concise en français couvrant : valorisation, santé financière, momentum technique, risques et perspectives.`;
+`;
 
   try {
     const res = await fetch(WEBHOOK_AI, {
