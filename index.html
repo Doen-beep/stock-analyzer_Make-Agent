@@ -83,6 +83,13 @@
   .ai-text .badge-buy { color:var(--green); font-weight:500; }
   .ai-text .badge-wait { color:#f8c450; font-weight:500; }
   .ai-text .badge-avoid { color:var(--red); font-weight:500; }
+  .verdict-banner { display:none; grid-template-columns:1fr 1fr 1fr; gap:0; margin-top:12px; border:0.5px solid var(--border); border-radius:6px; overflow:hidden; }
+  .verdict-cell { padding:10px 12px; text-align:center; background:var(--surface); border-right:0.5px solid var(--border); }
+  .verdict-cell:last-child { border-right:none; }
+  .verdict-cell .vc-label { font-family:var(--mono); font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:3px; }
+  .verdict-cell .vc-value { font-size:12px; font-weight:500; }
+  .verdict-full { grid-column:1/-1; padding:8px 12px; text-align:center; background:var(--surface); border-top:0.5px solid var(--border); font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .verdict-full span { color:var(--accent); font-weight:500; }
   .cursor { display:inline-block; width:2px; height:13px; background:var(--accent); margin-left:2px; vertical-align:middle; animation:blink 0.8s step-end infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
   .error-msg { width:100%; max-width:560px; font-family:var(--mono); font-size:12px; color:var(--red); padding:12px 16px; border:1px solid rgba(240,90,90,0.2); border-radius:6px; background:rgba(240,90,90,0.05); display:none; }
@@ -120,6 +127,55 @@
 <footer>Données à titre indicatif · Pas de conseil financier</footer>
 
 <script>
+
+function extractVerdict(text) {
+  const banner = document.getElementById('verdictBanner');
+  if (!banner) return;
+
+  // Qualité
+  const qualityMap = {
+    'Excellent': ['badge-buy', '⭐ Excellent'],
+    'Bon': ['badge-buy', '👍 Bon'],
+    'Moyen': ['badge-wait', '⚠️ Moyen'],
+    'Mauvais': ['badge-avoid', '❌ Mauvais']
+  };
+  for (const [k, [cls, label]] of Object.entries(qualityMap)) {
+    if (text.includes('Qualité') && text.includes(k)) {
+      document.getElementById('vQuality').innerHTML = `<span class="${cls}">${label}</span>`;
+      break;
+    }
+  }
+
+  // Valorisation
+  const valMap = {
+    'Sous-évalué': ['badge-buy', '📈 Sous-évalué'],
+    'Juste prix': ['badge-wait', '⚖️ Juste prix'],
+    'Surévalué': ['badge-avoid', '📉 Surévalué']
+  };
+  for (const [k, [cls, label]] of Object.entries(valMap)) {
+    if (text.includes(k)) {
+      document.getElementById('vValuation').innerHTML = `<span class="${cls}">${label}</span>`;
+      break;
+    }
+  }
+
+  // Décision
+  if (text.match(/Acheter/i) && !text.match(/Attendre|Éviter/i)) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-buy">✅ Acheter</span>';
+  } else if (text.match(/Attendre/i)) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-wait">⏳ Attendre</span>';
+  } else if (text.match(/Éviter/i)) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-avoid">✗ Éviter</span>';
+  }
+
+  // Prix cible
+  const priceMatch = text.match(/prix\s+(?:cible|d.entr[ée]e)[^\d]*([$€]?\s*[\d\s,.]+[$€]?)/i);
+  if (priceMatch) {
+    document.getElementById('vTarget').innerHTML = `Prix cible d'entrée : <span>${priceMatch[1].trim()}</span>`;
+  }
+
+  banner.style.display = 'grid';
+}
 
 function renderMarkdown(text) {
   let h = text
@@ -302,6 +358,7 @@ Dividende : $${fmt(sd.dividendRate)}/an (${pct(sd.dividendYield)})
       || (typeof json === 'string' ? json : JSON.stringify(json));
 
     aiText.innerHTML = renderMarkdown(text);
+    extractVerdict(text);
 
   } catch(e) {
     aiText.innerHTML=`<span style="color:var(--red)">Erreur : ${e.message}</span>`;
