@@ -129,85 +129,134 @@
 <script>
 
 function extractVerdict(text) {
-  const banner = document.getElementById('verdictBanner');
-  if (!banner) return;
+  // Créer le bandeau s'il n'existe pas encore dans le card
+  let banner = document.getElementById('verdictBanner');
+  if (!banner) {
+    const cardHeader = document.querySelector('.card-header');
+    if (!cardHeader) return;
+    banner = document.createElement('div');
+    banner.id = 'verdictBanner';
+    banner.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid var(--border);';
+    banner.innerHTML = `
+      <div style="padding:10px 12px;text-align:center;border-right:0.5px solid var(--border);">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Qualité</div>
+        <div id="vQuality" style="font-size:12px;font-weight:500;">—</div>
+      </div>
+      <div style="padding:10px 12px;text-align:center;border-right:0.5px solid var(--border);">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Valorisation</div>
+        <div id="vValuation" style="font-size:12px;font-weight:500;">—</div>
+      </div>
+      <div style="padding:10px 12px;text-align:center;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Décision</div>
+        <div id="vDecision" style="font-size:12px;font-weight:500;">—</div>
+      </div>
+      <div id="vTarget" style="display:none;grid-column:1/-1;padding:7px 12px;text-align:center;border-top:0.5px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--muted);"></div>
+    `;
+    cardHeader.insertAdjacentElement('afterend', banner);
+  }
 
   // Qualité
-  const qualityMap = {
-    'Excellent': ['badge-buy', '⭐ Excellent'],
-    'Bon': ['badge-buy', '👍 Bon'],
-    'Moyen': ['badge-wait', '⚠️ Moyen'],
-    'Mauvais': ['badge-avoid', '❌ Mauvais']
-  };
-  for (const [k, [cls, label]] of Object.entries(qualityMap)) {
-    if (text.includes('Qualité') && text.includes(k)) {
+  const qualities = [
+    ['Excellent', 'badge-buy', '⭐ Excellent'],
+    ['Bon', 'badge-buy', '👍 Bon'],
+    ['Moyen', 'badge-wait', '⚠️ Moyen'],
+    ['Mauvais', 'badge-avoid', '❌ Mauvais']
+  ];
+  for (const [k, cls, label] of qualities) {
+    if (text.includes(k)) {
       document.getElementById('vQuality').innerHTML = `<span class="${cls}">${label}</span>`;
       break;
     }
   }
 
   // Valorisation
-  const valMap = {
-    'Sous-évalué': ['badge-buy', '📈 Sous-évalué'],
-    'Juste prix': ['badge-wait', '⚖️ Juste prix'],
-    'Surévalué': ['badge-avoid', '📉 Surévalué']
-  };
-  for (const [k, [cls, label]] of Object.entries(valMap)) {
-    if (text.includes(k)) {
-      document.getElementById('vValuation').innerHTML = `<span class="${cls}">${label}</span>`;
+  if (text.includes('Sous-évalué')) {
+    document.getElementById('vValuation').innerHTML = '<span class="badge-buy">📈 Sous-évalué</span>';
+  } else if (text.includes('Juste prix')) {
+    document.getElementById('vValuation').innerHTML = '<span class="badge-wait">⚖️ Juste prix</span>';
+  } else if (text.includes('Surévalué')) {
+    document.getElementById('vValuation').innerHTML = '<span class="badge-avoid">📉 Surévalué</span>';
+  }
+
+  // Décision — ordre important : tester Attendre/Éviter avant Acheter
+  if (text.includes('Éviter')) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-avoid">✗ Éviter</span>';
+  } else if (text.includes('Attendre')) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-wait">⏳ Attendre</span>';
+  } else if (text.includes('Acheter')) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-buy">✅ Acheter</span>';
+  }
+
+  // Prix cible — cherche plusieurs patterns
+  const patterns = [
+    /prix\s+(?:cible|d.entr[eé]e)[^$€\d]*([$€]?\s*[\d\s,.]+[$€]?)/i,
+    /cible\s+d.entr[eé]e\s*:?\s*([$€]?\s*[\d\s,.]+)/i,
+    /entr[eé]e\s*(?:à|:)\s*([$€]?\s*[\d\s,.]+)/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m && m[1].trim().length > 1) {
+      const vt = document.getElementById('vTarget');
+      vt.innerHTML = `Prix cible d'entrée : <span style="color:var(--accent)">${m[1].trim()}</span>`;
+      vt.style.display = 'block';
       break;
     }
-  }
-
-  // Décision
-  if (text.match(/Acheter/i) && !text.match(/Attendre|Éviter/i)) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-buy">✅ Acheter</span>';
-  } else if (text.match(/Attendre/i)) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-wait">⏳ Attendre</span>';
-  } else if (text.match(/Éviter/i)) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-avoid">✗ Éviter</span>';
-  }
-
-  // Prix cible
-  const priceMatch = text.match(/prix\s+(?:cible|d.entr[ée]e)[^\d]*([$€]?\s*[\d\s,.]+[$€]?)/i);
-  if (priceMatch) {
-    document.getElementById('vTarget').innerHTML = `Prix cible d'entrée : <span>${priceMatch[1].trim()}</span>`;
   }
 
   banner.style.display = 'grid';
 }
 
 function renderMarkdown(text) {
+  if (!text) return '';
   let h = text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^#{2} (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^#{3} (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^#{1} (.+)$/gm,'<h2>$1</h2>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/Excellent/g,'<span class="badge-buy">Excellent</span>')
-    .replace(/Juste prix/g,'<span class="badge-wait">Juste prix</span>')
-    .replace(/Sous-évalué/g,'<span class="badge-buy">Sous-évalué</span>')
-    .replace(/Surévalué/g,'<span class="badge-avoid">Surévalué</span>')
-    .replace(/\bAcheter\b/g,'<span class="badge-buy">✓ Acheter</span>')
-    .replace(/Attendre une meilleure entrée/g,'<span class="badge-wait">⏳ Attendre</span>')
-    .replace(/\bÉviter\b/g,'<span class="badge-avoid">✗ Éviter</span>');
+    .replace(/\*(.+?)\*/g,'<em>$1</em>');
 
-  // Tables
-  h = h.replace(/\|(.+)\|\n\|[-| :]+\|\n((?:\|.+\|\n?)+)/g, (match, header, rows) => {
+  // Colorisation badges
+  h = h
+    .replace(/Excellent/g,'<span class="badge-buy">⭐ Excellent</span>')
+    .replace(/Bon/g,'<span class="badge-buy">👍 Bon</span>')
+    .replace(/Moyen/g,'<span class="badge-wait">⚠️ Moyen</span>')
+    .replace(/Juste prix/g,'<span class="badge-wait">⚖️ Juste prix</span>')
+    .replace(/Sous-évalué/g,'<span class="badge-buy">📈 Sous-évalué</span>')
+    .replace(/Surévalué/g,'<span class="badge-avoid">📉 Surévalué</span>')
+    .replace(/Éviter/g,'<span class="badge-avoid">✗ Éviter</span>')
+    .replace(/Attendre une meilleure entrée/g,'<span class="badge-wait">⏳ Attendre</span>')
+    .replace(/Attendre/g,'<span class="badge-wait">⏳ Attendre</span>')
+    .replace(/Acheter/g,'<span class="badge-buy">✅ Acheter</span>');
+
+  // Tables markdown
+  h = h.replace(/\|(.+)\|
+\|[-| :]+\|
+((?:\|.+\|
+?)+)/g, (match, header, rows) => {
     const ths = header.split('|').filter(s=>s.trim()).map(s=>`<th>${s.trim()}</th>`).join('');
-    const trs = rows.trim().split('\n').map(row => {
+    const trs = rows.trim().split('
+').map(row => {
       const tds = row.split('|').filter(s=>s.trim()).map(s=>`<td>${s.trim()}</td>`).join('');
       return `<tr>${tds}</tr>`;
     }).join('');
     return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
   });
 
-  // Lists
+  // Listes
   h = h.replace(/^[-•*] (.+)$/gm, '<li>$1</li>');
-  h = h.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+  h = h.replace(/(<li>.*?<\/li>
+?)+/gs, m => `<ul>${m}</ul>`);
 
-  // Paragraphs
-  h = h.replace(/\n{2,}/g, '</p><p>').replace(/\n/g, ' ');
-  return '<p>' + h + '</p>';
+  // Étapes en titres si pas déjà formatées
+  h = h.replace(/^(ÉTAPE \d[^:
+]*)/gm, '<h2>$1</h2>');
+
+  // Paragraphes
+  h = h.replace(/
+{2,}/g, '</p><p>').replace(/
+/g, '<br>');
+  return '<div class="ai-body"><p>' + h + '</p></div>';
 }
 
 const WEBHOOK   = 'https://hook.eu1.make.com/1mlw60agtu0lw22kupuqvxa6jfwsx1oa/';
