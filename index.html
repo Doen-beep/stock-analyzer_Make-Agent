@@ -293,11 +293,13 @@ Dividende : $${fmt(sd.dividendRate)}/an (${pct(sd.dividendYield)})
     const json = await res.json();
 
     // Extraire le texte de la réponse OpenAI Responses API
-    const text = json?.output?.[0]?.content?.[0]?.text
+    // Cherche le message texte dans output (peut être à n'importe quel index)
+    const output = json?.output || json?.data?.output || [];
+    const msgBlock = output.find(o => o.type === 'message');
+    const text = msgBlock?.content?.find(c => c.type === 'output_text')?.text
       || json?.output_text
-      || json?.data?.output?.[0]?.content?.[0]?.text
       || json?.data?.output_text
-      || JSON.stringify(json);
+      || (typeof json === 'string' ? json : JSON.stringify(json));
 
     aiText.innerHTML = renderMarkdown(text);
 
