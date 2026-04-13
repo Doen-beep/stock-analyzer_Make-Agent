@@ -299,7 +299,7 @@ Dividende : $${fmt(sd.dividendRate)}/an (${pct(sd.dividendYield)})
       || json?.data?.output_text
       || JSON.stringify(json);
 
-    aiText.innerHTML = text.replace(/\n/g, '<br>');
+    aiText.innerHTML = renderMarkdown(text);
 
   } catch(e) {
     aiText.innerHTML=`<span style="color:var(--red)">Erreur : ${e.message}</span>`;
