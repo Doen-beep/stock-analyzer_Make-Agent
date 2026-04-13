@@ -89,10 +89,6 @@
     <button id="btn" onclick="analyze()">Analyser</button>
   </div>
 
-  <div class="api-key-bar">
-    <input type="password" id="apiKey" placeholder="Clé API OpenAI  sk-…" oninput="onKeyInput()"/>
-    <span class="key-ok" id="keyOk">✓ clé enregistrée</span>
-  </div>
   <div class="chips">
     <button class="chip" onclick="setTicker('AAPL')">AAPL</button>
     <button class="chip" onclick="setTicker('TSLA')">TSLA</button>
@@ -115,18 +111,7 @@ const WEBHOOK   = 'https://hook.eu1.make.com/1mlw60agtu0lw22kupuqvxa6jfwsx1oa/';
 const WEBHOOK_AI = 'https://hook.eu1.make.com/xhpvfxz13qin7xhr0jx92v5owusxidys';
 let lastData = null;
 
-window.addEventListener('DOMContentLoaded', () => {
-  const k = sessionStorage.getItem('oai_key');
-  if (k) { document.getElementById('apiKey').value = k; document.getElementById('keyOk').style.display = 'inline'; }
-});
-
-function onKeyInput() {
-  const v = document.getElementById('apiKey').value.trim();
-  if (v) sessionStorage.setItem('oai_key', v);
-  document.getElementById('keyOk').style.display = v ? 'inline' : 'none';
-}
-
-function getKey() { return document.getElementById('apiKey').value.trim(); }
+function getKey() { return ''; }
 function setTicker(s) { document.getElementById('ticker').value = s; analyze(); }
 document.getElementById('ticker').addEventListener('keydown', e => { if (e.key==='Enter') analyze(); });
 
@@ -210,7 +195,7 @@ function render(d) {
       <div class="ai-text" id="aiText"></div>
     </div>`;
   document.getElementById('card').style.display='block';
-  document.getElementById('aiBtnWrap').style.display=getKey()?'block':'none';
+  document.getElementById('aiBtnWrap').style.display='block';
 }
 
 
