@@ -208,60 +208,82 @@ function extractVerdict(text) {
 
 function renderMarkdown(text) {
   if (!text) return '';
-  let h = text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/^#{2} (.+)$/gm,'<h2>$1</h2>')
-    .replace(/^#{3} (.+)$/gm,'<h3>$1</h3>')
-    .replace(/^#{1} (.+)$/gm,'<h2>$1</h2>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>');
+  const lines = text.split('\n');
+  let html = '';
+  let inTable = false;
+  let tableRows = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i]
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>');
+
+    // Titres
+    if (line.startsWith('## ') || line.match(/^ÉTAPE \d/)) {
+      html += '<h2>' + line.replace(/^## /,'') + '</h2>';
+    } else if (line.startsWith('### ') || line.startsWith('**') && line.endsWith('**')) {
+      html += '<h3>' + line.replace(/^### /,'').replace(/^\*\*|\*\*$/g,'') + '</h3>';
+    }
+    // Tables
+    else if (line.startsWith('|')) {
+      if (!inTable) { inTable = true; tableRows = []; }
+      tableRows.push(line);
+    } else if (inTable) {
+      inTable = false;
+      // Render table
+      const headers = tableRows[0].split('|').filter(s=>s.trim());
+      const ths = headers.map(s=>'<th>'+s.trim()+'</th>').join('');
+      let trs = '';
+      for (let r = 2; r < tableRows.length; r++) {
+        const cells = tableRows[r].split('|').filter(s=>s.trim());
+        trs += '<tr>' + cells.map(s=>'<td>'+s.trim()+'</td>').join('') + '</tr>';
+      }
+      html += '<table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+      // Process current line too
+      if (line.trim()) html += '<p>' + line + '</p>';
+    }
+    // Listes
+    else if (line.match(/^[-•*] /)) {
+      html += '<li>' + line.replace(/^[-•*] /,'') + '</li>';
+    }
+    // Ligne vide
+    else if (!line.trim()) {
+      html += '<br>';
+    }
+    // Paragraphe normal
+    else {
+      html += '<p>' + line + '</p>';
+    }
+  }
+
+  // Flush table si fin de texte
+  if (inTable && tableRows.length) {
+    const headers = tableRows[0].split('|').filter(s=>s.trim());
+    const ths = headers.map(s=>'<th>'+s.trim()+'</th>').join('');
+    let trs = '';
+    for (let r = 2; r < tableRows.length; r++) {
+      const cells = tableRows[r].split('|').filter(s=>s.trim());
+      trs += '<tr>' + cells.map(s=>'<td>'+s.trim()+'</td>').join('') + '</tr>';
+    }
+    html += '<table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+  }
 
   // Colorisation badges
-  h = h
-    .replace(/Excellent/g,'<span class="badge-buy">⭐ Excellent</span>')
-    .replace(/Bon/g,'<span class="badge-buy">👍 Bon</span>')
-    .replace(/Moyen/g,'<span class="badge-wait">⚠️ Moyen</span>')
+  html = html
+    .replace(/\bExcellent\b/g,'<span class="badge-buy">⭐ Excellent</span>')
+    .replace(/\bMauvais\b/g,'<span class="badge-avoid">❌ Mauvais</span>')
     .replace(/Juste prix/g,'<span class="badge-wait">⚖️ Juste prix</span>')
     .replace(/Sous-évalué/g,'<span class="badge-buy">📈 Sous-évalué</span>')
     .replace(/Surévalué/g,'<span class="badge-avoid">📉 Surévalué</span>')
-    .replace(/Éviter/g,'<span class="badge-avoid">✗ Éviter</span>')
     .replace(/Attendre une meilleure entrée/g,'<span class="badge-wait">⏳ Attendre</span>')
-    .replace(/Attendre/g,'<span class="badge-wait">⏳ Attendre</span>')
-    .replace(/Acheter/g,'<span class="badge-buy">✅ Acheter</span>');
+    .replace(/\bAttendre\b/g,'<span class="badge-wait">⏳ Attendre</span>')
+    .replace(/\bÉviter\b/g,'<span class="badge-avoid">✗ Éviter</span>')
+    .replace(/\bAcheter\b/g,'<span class="badge-buy">✅ Acheter</span>');
 
-  // Tables markdown
-  h = h.replace(/\|(.+)\|
-\|[-| :]+\|
-((?:\|.+\|
-?)+)/g, (match, header, rows) => {
-    const ths = header.split('|').filter(s=>s.trim()).map(s=>`<th>${s.trim()}</th>`).join('');
-    const trs = rows.trim().split('
-').map(row => {
-      const tds = row.split('|').filter(s=>s.trim()).map(s=>`<td>${s.trim()}</td>`).join('');
-      return `<tr>${tds}</tr>`;
-    }).join('');
-    return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
-  });
-
-  // Listes
-  h = h.replace(/^[-•*] (.+)$/gm, '<li>$1</li>');
-  h = h.replace(/(<li>.*?<\/li>
-?)+/gs, m => `<ul>${m}</ul>`);
-
-  // Étapes en titres si pas déjà formatées
-  h = h.replace(/^(ÉTAPE \d[^:
-]*)/gm, '<h2>$1</h2>');
-
-  // Paragraphes
-  h = h.replace(/
-{2,}/g, '</p><p>').replace(/
-/g, '<br>');
-  return '<div class="ai-body"><p>' + h + '</p></div>';
+  return '<div class="ai-body">' + html + '</div>';
 }
 
-const WEBHOOK   = 'https://hook.eu1.make.com/1mlw60agtu0lw22kupuqvxa6jfwsx1oa/';
-const WEBHOOK_AI = 'https://hook.eu1.make.com/xhpvfxz13qin7xhr0jx92v5owusxidys';
-let lastData = null;
 
 function getKey() { return ''; }
 function setTicker(s) { document.getElementById('ticker').value = s; analyze(); }
