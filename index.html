@@ -238,7 +238,7 @@ Fournis une analyse concise en français couvrant : valorisation, santé financi
     const res = await fetch(WEBHOOK_AI, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input_as_text })
+      body: JSON.stringify({ input_as_text: input_as_text.replace(/[\r\n]+/g, ' ') })
     });
 
     if (!res.ok) throw new Error('HTTP ' + res.status);
