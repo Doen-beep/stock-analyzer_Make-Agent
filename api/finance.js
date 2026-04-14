@@ -1,6 +1,4 @@
-const yahooFinance = require('yahoo-finance2').default;
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 
@@ -10,6 +8,8 @@ module.exports = async function handler(req, res) {
   if (!symbol) return res.status(400).json({ error: 'symbol requis' });
 
   try {
+    const { default: yahooFinance } = await import('yahoo-finance2');
+
     const data = await yahooFinance.quoteSummary(symbol, {
       modules: [
         'price',
@@ -20,14 +20,13 @@ module.exports = async function handler(req, res) {
         'incomeStatementHistory',
         'cashflowStatementHistory',
         'balanceSheetHistory',
-      ],
-      fetchType: 'lazy',
+      ]
     });
 
     res.status(200).json({ data: { ...data, symbol } });
 
   } catch (e) {
-    console.error('yahoo-finance2 error:', e.message);
+    console.error('Error:', e.message);
     res.status(500).json({ error: e.message });
   }
-};
+}
