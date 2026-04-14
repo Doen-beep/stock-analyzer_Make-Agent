@@ -98,22 +98,33 @@ header p { font-size:13px; color:var(--muted); }
 .badge-avoid { color:var(--red); font-weight:500; }
 
 /* Bandeau verdict */
-#verdictBanner { background:var(--surface); }
+#verdictBanner { background:rgba(124,106,247,0.06); border-top:1px solid var(--border); }
 #verdictBanner .vc-label {
   font-family:var(--mono);
-  font-size:9px;
-  letter-spacing:0.12em;
+  font-size:10px;
+  letter-spacing:0.14em;
   text-transform:uppercase;
-  color:var(--muted);
-  margin-bottom:6px;
-}
-#verdictBanner .vc-value {
-  font-size:15px;
+  color:#9990bb;
+  margin-bottom:8px;
   font-weight:500;
 }
-#verdictBanner .badge-buy { color:var(--green); font-size:15px; }
-#verdictBanner .badge-wait { color:#f8c450; font-size:15px; }
-#verdictBanner .badge-avoid { color:var(--red); font-size:15px; }
+#verdictBanner .vc-value {
+  font-size:16px;
+  font-weight:600;
+}
+#verdictBanner .badge-buy { color:var(--green); font-size:16px; }
+#verdictBanner .badge-wait { color:#f8c450; font-size:16px; }
+#verdictBanner .badge-avoid { color:var(--red); font-size:16px; }
+#vTarget {
+  font-size:13px !important;
+  color:#bbb8cc !important;
+  letter-spacing:0.04em;
+}
+#vTarget span {
+  color:#fff !important;
+  font-size:15px !important;
+  font-weight:600 !important;
+}
 
 .error-msg { width:100%; max-width:560px; font-family:var(--mono); font-size:12px; color:var(--red); padding:12px 16px; border:1px solid rgba(240,90,90,0.2); border-radius:6px; background:rgba(240,90,90,0.05); display:none; }
 
