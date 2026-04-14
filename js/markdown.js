@@ -86,19 +86,19 @@ function extractVerdict(text) {
     banner.id = 'verdictBanner';
     banner.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid var(--border);';
     banner.innerHTML = `
-      <div style="padding:10px 12px;text-align:center;border-right:0.5px solid var(--border);">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Qualité</div>
-        <div id="vQuality" style="font-size:12px;font-weight:500;">—</div>
+      <div style="padding:16px 12px;text-align:center;border-right:0.5px solid var(--border);">
+        <div class="vc-label">Qualité</div>
+        <div id="vQuality" class="vc-value">—</div>
       </div>
-      <div style="padding:10px 12px;text-align:center;border-right:0.5px solid var(--border);">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Valorisation</div>
-        <div id="vValuation" style="font-size:12px;font-weight:500;">—</div>
+      <div style="padding:16px 12px;text-align:center;border-right:0.5px solid var(--border);">
+        <div class="vc-label">Valorisation</div>
+        <div id="vValuation" class="vc-value">—</div>
       </div>
-      <div style="padding:10px 12px;text-align:center;">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;">Décision</div>
-        <div id="vDecision" style="font-size:12px;font-weight:500;">—</div>
+      <div style="padding:16px 12px;text-align:center;">
+        <div class="vc-label">Décision</div>
+        <div id="vDecision" class="vc-value">—</div>
       </div>
-      <div id="vTarget" style="display:none;grid-column:1/-1;padding:7px 12px;text-align:center;border-top:0.5px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--muted);"></div>
+      <div id="vTarget" style="display:none;grid-column:1/-1;padding:10px 12px;text-align:center;border-top:0.5px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);"></div>
     `;
     cardHeader.insertAdjacentElement('afterend', banner);
   }
