@@ -1,17 +1,20 @@
+import YahooFinance from 'yahoo-finance2';
+
+const yahooFinance = new YahooFinance();
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { symbol } = req.query;
   if (!symbol) return res.status(400).json({ error: 'symbol requis' });
 
   try {
-    const yahooFinance = (await import('yahoo-finance2')).default;
-
     const data = await yahooFinance.quoteSummary(symbol, {
       modules: [
         'price',
-        'summaryDetail', 
+        'summaryDetail',
         'financialData',
         'defaultKeyStatistics',
         'earnings',
@@ -25,6 +28,6 @@ export default async function handler(req, res) {
 
   } catch (e) {
     console.error('Error:', e.message);
-    res.status(500).json({ error: e.message, stack: e.stack });
+    res.status(500).json({ error: e.message });
   }
 }
