@@ -17,7 +17,7 @@ async function analyze() {
   status.textContent = 'Chargement de ' + ticker + '…';
 
   try {
-    const res = await fetch(WEBHOOK + '?symbol=' + encodeURIComponent(ticker));
+    const res = await fetch(WEBHOOK + '?symbol=' + encodeURIComponent(ticker) + '&region=' + getRegion(ticker));
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     const data = json.data || json;
