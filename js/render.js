@@ -8,6 +8,8 @@ function render(d) {
   const name  = p.shortName || sym;
   const price = p.regularMarketPrice;
   const chg   = p.regularMarketChange;
+  const currency = p.currency || sd.currency || 'USD';
+  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','HKD':'HK$','AUD':'A$'}[currency] || currency+' ';
 
   document.getElementById('card').innerHTML = `
     <div class="card-header">
@@ -17,22 +19,22 @@ function render(d) {
         ${recBadge(fd.recommendationKey)}
       </div>
       <div class="price-block">
-        <div class="price">$${fmt(price)}</div>
+        <div class="price">${cs}${fmt(price)}</div>
         <div class="change ${cc(chg)}">${chg >= 0 ? '+' : ''}${fmt(chg)} (${pct(p.regularMarketChangePercent)})</div>
-        ${p.postMarketPrice ? `<div class="change ${cc(p.postMarketChange)}" style="font-size:11px;margin-top:2px">After-hours $${fmt(p.postMarketPrice)} ${p.postMarketChange >= 0 ? '+' : ''}${fmt(p.postMarketChange)}</div>` : ''}
+        ${p.postMarketPrice ? `<div class="change ${cc(p.postMarketChange)}" style="font-size:11px;margin-top:2px">After-hours ${cs}${fmt(p.postMarketPrice)} ${p.postMarketChange >= 0 ? '+' : ''}${fmt(p.postMarketChange)}</div>` : ''}
       </div>
     </div>
 
     <div class="grid">
       <div class="section"><h3>Séance</h3>
-        <div class="row"><span class="label">Ouverture</span><span class="val">$${fmt(p.regularMarketOpen)}</span></div>
+        <div class="row"><span class="label">Ouverture</span><span class="val">${cs}${fmt(p.regularMarketOpen)}</span></div>
         <div class="row"><span class="label">Volume</span><span class="val">${fmtM(p.regularMarketVolume)}</span></div>
         <div class="row"><span class="label">Vol. moy. 3M</span><span class="val">${fmtM(sd.averageVolume)}</span></div>
         ${rbar(p.regularMarketDayLow, p.regularMarketDayHigh, price)}
       </div>
       <div class="section"><h3>52 semaines</h3>
-        <div class="row"><span class="label">Plus haut</span><span class="val up">$${fmt(sd.fiftyTwoWeekHigh)}</span></div>
-        <div class="row"><span class="label">Plus bas</span><span class="val down">$${fmt(sd.fiftyTwoWeekLow)}</span></div>
+        <div class="row"><span class="label">Plus haut</span><span class="val up">${cs}${fmt(sd.fiftyTwoWeekHigh)}</span></div>
+        <div class="row"><span class="label">Plus bas</span><span class="val down">${cs}${fmt(sd.fiftyTwoWeekLow)}</span></div>
         <div class="row"><span class="label">Perf.</span><span class="val ${cc(ks['52WeekChange'])}">${pct(ks['52WeekChange'])}</span></div>
         ${rbar(sd.fiftyTwoWeekLow, sd.fiftyTwoWeekHigh, price)}
       </div>
@@ -45,9 +47,9 @@ function render(d) {
       </div>
       <div class="section"><h3>Analystes (${fd.numberOfAnalystOpinions || '—'})</h3>
         <div class="row"><span class="label">Recommandation</span><span class="val">${fd.recommendationKey || '—'}</span></div>
-        <div class="row"><span class="label">Objectif médian</span><span class="val">$${fmt(fd.targetMedianPrice)}</span></div>
+        <div class="row"><span class="label">Objectif médian</span><span class="val">${cs}${fmt(fd.targetMedianPrice)}</span></div>
         <div class="row"><span class="label">Potentiel</span><span class="val ${price && fd.targetMedianPrice && fd.targetMedianPrice > price ? 'up' : 'down'}">${price && fd.targetMedianPrice ? pct((fd.targetMedianPrice - price) / price) : '—'}</span></div>
-        <div class="row"><span class="label">Fourchette</span><span class="val">$${fmt(fd.targetLowPrice)}–$${fmt(fd.targetHighPrice)}</span></div>
+        <div class="row"><span class="label">Fourchette</span><span class="val">${cs}${fmt(fd.targetLowPrice)}–${cs}${fmt(fd.targetHighPrice)}</span></div>
       </div>
       <div class="section"><h3>Finances</h3>
         <div class="row"><span class="label">CA</span><span class="val">${fmtB(fd.totalRevenue)}</span></div>
@@ -57,10 +59,10 @@ function render(d) {
         <div class="row"><span class="label">Dette/FP</span><span class="val">${fmt(fd.debtToEquity)}x</span></div>
       </div>
       <div class="section"><h3>Dividende & actionnariat</h3>
-        <div class="row"><span class="label">Dividende</span><span class="val">$${fmt(sd.dividendRate)}/an</span></div>
+        <div class="row"><span class="label">Dividende</span><span class="val">${cs}${fmt(sd.dividendRate)}/an</span></div>
         <div class="row"><span class="label">Rendement</span><span class="val">${pct(sd.dividendYield)}</span></div>
-        <div class="row"><span class="label">EPS trailing</span><span class="val">$${fmt(ks.trailingEps)}</span></div>
-        <div class="row"><span class="label">EPS forward</span><span class="val">$${fmt(ks.forwardEps)}</span></div>
+        <div class="row"><span class="label">EPS trailing</span><span class="val">${cs}${fmt(ks.trailingEps)}</span></div>
+        <div class="row"><span class="label">EPS forward</span><span class="val">${cs}${fmt(ks.forwardEps)}</span></div>
         <div class="row"><span class="label">Institutions</span><span class="val">${pct(ks.heldPercentInstitutions)}</span></div>
       </div>
     </div>
