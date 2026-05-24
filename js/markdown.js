@@ -1,3 +1,4 @@
+/* markdown.js | v1.1 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -136,18 +137,28 @@ function extractVerdict(text) {
   }
 
   // Prix cible
+  let target = '—';
   const patterns = [
-    /prix\s+(?:cible|d.entr[eé]e)[^$\d]*([$]?\s*[\d.,]+)/i,
-    /entr[eé]e\s*(?:à|:)\s*([$]?\s*[\d.,]+)/i,
-    /cible\s*(?:à|:)\s*([$]?\s*[\d.,]+)/i,
+    /prix\s+(?:cible|d.entr[eé]e)[^$\d]*([$€]?\s*[\d.,]+)/i,
+    /entr[eé]e\s*(?:à|:)\s*([$€]?\s*[\d.,]+)/i,
+    /cible\s*(?:à|:)\s*([$€]?\s*[\d.,]+)/i,
   ];
   for (const p of patterns) {
     const m = text.match(p);
     if (m && m[1].trim().length > 1) {
+      target = m[1].trim();
       const vt = document.getElementById('vTarget');
-      vt.innerHTML = `Prix cible d'entrée : <span style="color:var(--accent);font-weight:500;">${m[1].trim()}</span>`;
+      vt.innerHTML = `Prix cible d'entrée : <span style="color:var(--accent);font-weight:500;">${target}</span>`;
       vt.style.display = 'block';
       break;
     }
   }
+
+  // Retourner le verdict pour la watchlist
+  return {
+    quality: document.getElementById('vQuality')?.textContent?.trim() || '—',
+    valuation: document.getElementById('vValuation')?.textContent?.trim() || '—',
+    decision: document.getElementById('vDecision')?.textContent?.trim() || '—',
+    target: target,
+  };
 }
