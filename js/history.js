@@ -1,4 +1,4 @@
-/* history.js | v1.8 | 2026-05-24 */
+/* history.js | v1.9 | 2026-05-24 */
 
 const SUPABASE_URL = 'https://qxqnxobfsdeqhfanphdo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_KwmWQJ7mAXWRPX03aW2Bvw_aDhwo6O6';
@@ -102,6 +102,7 @@ async function renderHistory() {
         const mins = Math.floor((s.duration_seconds || 0) / 60);
         const secs = (s.duration_seconds || 0) % 60;
         const duration = mins > 0 ? mins + ' min ' + secs + 's' : (s.duration_seconds || 0) + 's';
+        const isShort = (s.duration_seconds || 0) < 3;
         const orgLabel = s.org ? '<span style="font-size:10px;color:var(--muted);margin-left:8px;font-family:var(--mono);">' + s.org.substring(0,40) + '</span>' : '';
         const botLabel = isShort ? '<span style="font-size:10px;color:var(--red);margin-left:6px;">🤖 bot?</span>' : '';
         html += '<div class="hist-row" style="opacity:' + (isShort ? '0.5' : '1') + '">';
