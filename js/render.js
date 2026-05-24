@@ -69,6 +69,7 @@ function render(d) {
 
     <div class="ai-btn-wrap" id="aiBtnWrap">
       <button class="ai-btn" id="aiBtn" onclick="aiAnalyze()">Analyser avec l'agent IA</button>
+      <button class="wl-btn" id="wlBtn" onclick="addCurrentToWatchlist()" style="display:none;">+ Ajouter à la watchlist</button>
     </div>
     <div class="ai-block" id="aiBlock">
       <h3>Analyse IA</h3>
