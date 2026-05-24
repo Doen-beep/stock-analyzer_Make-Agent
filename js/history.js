@@ -1,4 +1,4 @@
-/* history.js | v1.6 | 2026-05-24 */
+/* history.js | v1.8 | 2026-05-24 */
 
 const SUPABASE_URL = 'https://qxqnxobfsdeqhfanphdo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_KwmWQJ7mAXWRPX03aW2Bvw_aDhwo6O6';
@@ -33,13 +33,27 @@ async function initSession() {
   try {
     const geo = await fetch('https://ipapi.co/json/').then(r => r.json());
     const now = new Date();
+    // Filtrer les IPs de bots connus
+    const botCities = ['santa clara', 'ashburn', 'boydton', 'des moines', 'council bluffs', 'the dalles'];
+    const botOrgs = ['google', 'amazon', 'microsoft', 'apple', 'cloudflare', 'akamai', 'fastly'];
+    const cityLower = (geo.city || '').toLowerCase();
+    const orgLower = (geo.org || '').toLowerCase();
+    const isBot = botCities.some(c => cityLower.includes(c)) || botOrgs.some(o => orgLower.includes(o));
+
+    if (isBot) {
+      console.log('Bot detected, session not recorded:', geo.city, geo.org);
+      return;
+    }
+
     const session = {
       ip: geo.ip || 'unknown',
       city: geo.city || 'unknown',
       country: geo.country_name || 'unknown',
       country_code: (geo.country_code || '').toLowerCase(),
-      date: now.toLocaleDateString('fr-FR'),
-      time: now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}),
+      org: geo.org || geo.asn || 'unknown',
+      timezone: geo.timezone || '—',
+      date: now.toLocaleDateString('en-GB'),
+      time: now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}),
       duration_seconds: 0,
     };
     const result = await supabaseCall('POST', 'sessions', session);
@@ -88,8 +102,10 @@ async function renderHistory() {
         const mins = Math.floor((s.duration_seconds || 0) / 60);
         const secs = (s.duration_seconds || 0) % 60;
         const duration = mins > 0 ? mins + ' min ' + secs + 's' : (s.duration_seconds || 0) + 's';
-        html += '<div class="hist-row">';
-        html += '<div class="hist-left">' + flag + '<span class="hist-ticker">' + (s.city || '—') + '</span><span class="hist-name">' + (s.country || '—') + '</span></div>';
+        const orgLabel = s.org ? '<span style="font-size:10px;color:var(--muted);margin-left:8px;font-family:var(--mono);">' + s.org.substring(0,40) + '</span>' : '';
+        const botLabel = isShort ? '<span style="font-size:10px;color:var(--red);margin-left:6px;">🤖 bot?</span>' : '';
+        html += '<div class="hist-row" style="opacity:' + (isShort ? '0.5' : '1') + '">';
+        html += '<div class="hist-left">' + flag + '<span class="hist-ticker">' + (s.city || '—') + '</span><span class="hist-name">' + (s.country || '—') + '</span>' + orgLabel + botLabel + '</div>';
         html += '<div class="hist-right"><span class="hist-price">' + duration + '</span><span class="hist-time">' + (s.time || '—') + '</span></div>';
         html += '</div>';
       });
