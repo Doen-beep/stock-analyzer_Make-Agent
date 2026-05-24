@@ -1,4 +1,4 @@
-/* search.js | v1.2 | 2026-05-24 */
+/* search.js | v1.2 | 2026-05-24  */
 let allCompanies = [];
 let searchOpen = false;
 let searchTimeout = null;
