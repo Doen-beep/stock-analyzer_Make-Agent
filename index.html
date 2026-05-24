@@ -40,9 +40,11 @@
 <script src="js/utils.js"></script>
 <script src="js/markdown.js"></script>
 <script src="js/render.js"></script>
+<script src="js/search.js"></script>
 <script src="js/analyze.js"></script>
 <script>
-  function setTicker(s) { document.getElementById('ticker').value = s; analyze(); }
+  function setTicker(s) { document.getElementById('ticker').value = s; closeDropdown(); analyze(); }
+  initSearch();
   document.getElementById('ticker').addEventListener('keydown', e => { if (e.key === 'Enter') analyze(); });
 </script>
 
