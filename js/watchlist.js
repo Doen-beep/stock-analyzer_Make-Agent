@@ -1,4 +1,4 @@
-/* watchlist.js | v1.3 | 2026-05-24 */
+/* watchlist.js | v1.4 | 2026-05-24 */
 const WATCHLIST_KEY = 'stock_watchlist';
 
 function getWatchlist() {
@@ -32,13 +32,19 @@ function addToWatchlist(data, verdict) {
   };
 
   const idx = list.findIndex(e => e.ticker === entry.ticker);
-  if (idx >= 0) list[idx] = entry;
-  else list.unshift(entry);
+  const isUpdate = idx >= 0;
+  if (isUpdate) {
+    // Conserver le prix d'origine si déjà dans la watchlist
+    entry.priceAdded = list[idx].priceAdded;
+    list[idx] = entry;
+  } else {
+    list.unshift(entry);
+  }
 
   saveWatchlist(list);
   updateWlCount();
   renderWatchlist();
-  showWatchlistTab();
+  return isUpdate;
 }
 
 function removeFromWatchlist(ticker) {
