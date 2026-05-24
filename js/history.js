@@ -1,4 +1,4 @@
-/* history.js | v2.0 | 2026-05-24 */
+/* history.js | v2.0 | 2026-05-24  */
 
 const SUPABASE_URL = 'https://qxqnxobfsdeqhfanphdo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_KwmWQJ7mAXWRPX03aW2Bvw_aDhwo6O6';
