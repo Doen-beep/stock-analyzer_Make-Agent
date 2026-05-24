@@ -1,4 +1,4 @@
-/* render.js | v1.3 | 2026-05-24 */
+/* render.js | v1.4 | 2026-05-24 */
 
 // Tooltip helper
 function tip(text) {
