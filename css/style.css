@@ -1,4 +1,4 @@
-/* style.css | v1.9 | 2026-05-24 */
+/* style.css | v2.0 | 2026-05-24 */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -18,8 +18,8 @@
 body { background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:32px 16px; }
 
 header { text-align:center; margin-bottom:36px; }
-header h1 { font-family:var(--mono); font-size:15px; font-weight:500; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); }
-header p { font-size:12px; color:var(--muted); margin-top:8px; letter-spacing:0.04em; }
+header h1 { font-family:var(--mono); font-size:24px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); }
+header p { font-size:13px; color:var(--muted); margin-top:10px; letter-spacing:0.04em; }
 
 .tabs { display:flex; gap:4px; margin-bottom:24px; border-bottom:1px solid var(--border); width:100%; max-width:900px; justify-content:center; }
 .tab { background:none; border:none; padding:12px 28px; cursor:pointer; font-family:var(--mono); font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#9990bb; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.15s; }
