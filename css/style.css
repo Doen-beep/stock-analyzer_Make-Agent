@@ -56,20 +56,20 @@ header p { font-size:13px; color:var(--muted); }
 .rec-sell { background:rgba(240,90,90,0.12); color:var(--red); border:1px solid rgba(240,90,90,0.25); }
 
 .grid { display:grid; grid-template-columns:1fr 1fr; }
-.section { padding:18px 24px; border-bottom:1px solid var(--border); }
+.section { padding:18px 24px; border-bottom:1px solid var(--border); background:var(--surface); }
 .section:nth-child(odd) { border-right:1px solid var(--border); }
 .section:last-child, .section:nth-last-child(2) { border-bottom:none; }
-.section h3 { font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+.section h3 { font-family:var(--mono); font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:#7c6af7; margin-bottom:12px; }
 
-.row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; font-size:13px; }
+.row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; font-size:13px; color:#c0bcd8; }
 .row:last-child { margin-bottom:0; }
-.row .label { color:var(--muted); }
-.row .val { font-family:var(--mono); font-size:12px; font-weight:500; }
+.row .label { color:#a09cb8; }
+.row .val { font-family:var(--mono); font-size:12px; font-weight:500; color:#e8e6f0; }
 
 .range-bar { margin-top:10px; position:relative; height:3px; background:var(--border); border-radius:2px; }
 .range-fill { position:absolute; height:100%; background:var(--accent); border-radius:2px; opacity:0.5; }
 .range-dot { position:absolute; width:7px; height:7px; background:var(--accent); border-radius:50%; top:-2px; transform:translateX(-50%); }
-.range-labels { display:flex; justify-content:space-between; margin-top:6px; font-family:var(--mono); font-size:10px; color:var(--muted); }
+.range-labels { display:flex; justify-content:space-between; margin-top:6px; font-family:var(--mono); font-size:10px; color:#9990bb; }
 
 .ai-btn-wrap { padding:16px 24px; border-top:1px solid var(--border); display:none; }
 .ai-btn { width:100%; padding:12px; background:none; border:1px solid var(--accent); border-radius:5px; cursor:pointer; font-family:var(--mono); font-size:12px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); transition:all 0.15s; }
