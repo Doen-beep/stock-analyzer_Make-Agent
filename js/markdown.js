@@ -1,4 +1,4 @@
-/* markdown.js | v1.2 | 2026-05-24 */
+/* markdown.js | v1.3 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
