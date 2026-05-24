@@ -1,4 +1,4 @@
-/* watchlist.js | v1.6 | 2026-05-24 */
+/* watchlist.js | v1.7 | 2026-05-24 */
 const WATCHLIST_KEY = 'stock_watchlist';
 
 function updateWlCount() {
@@ -80,13 +80,13 @@ function renderWatchlist() {
         <thead>
           <tr>
             <th>Company</th>
+            <th class="num">Entry Target</th>
             <th class="num">Price Added</th>
             <th class="num">Current Price</th>
             <th class="num">Change</th>
             <th class="ctr">Quality</th>
             <th class="ctr">Valuation</th>
             <th class="ctr">Decision</th>
-            <th class="num">Entry Target</th>
             <th class="ctr">Analyzed on</th>
             <th></th>
           </tr>
@@ -103,13 +103,13 @@ function renderWatchlist() {
                 <div class="wl-ticker">${e.ticker}</div>
                 <div class="wl-name">${e.name}</div>
               </td>
+              <td class="num mono accent">${e.target}</td>
               <td class="num mono muted">${e.currency}${Number(e.priceAdded||0).toFixed(2)}</td>
               <td class="num mono bold" id="wl-price-${e.ticker}">${e.currency}${Number(e.priceCurrent||0).toFixed(2)}</td>
               <td class="num mono" style="color:${varColor}">${varSign}${varPct.toFixed(2)}%</td>
               <td class="ctr small">${e.quality}</td>
               <td class="ctr small">${e.valuation}</td>
               <td class="ctr small ${decisionClass}">${e.decision}</td>
-              <td class="num mono accent">${e.target}</td>
               <td class="ctr tiny muted">${e.dateAnalyzed || e.dateAdded}</td>
               <td class="ctr">
                 <button class="wl-del" onclick="event.stopPropagation();removeFromWatchlist('${e.ticker}')">✕</button>
