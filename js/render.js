@@ -1,3 +1,4 @@
+/* render.js | v1.1 | 2026-05-24 */
 function render(d) {
   const p  = d.price || {};
   const sd = d.summaryDetail || {};
@@ -26,41 +27,41 @@ function render(d) {
     </div>
 
     <div class="grid">
-      <div class="section"><h3>Séance</h3>
-        <div class="row"><span class="label">Ouverture</span><span class="val">${cs}${fmt(p.regularMarketOpen)}</span></div>
+      <div class="section"><h3>Session</h3>
+        <div class="row"><span class="label">Open</span><span class="val">${cs}${fmt(p.regularMarketOpen)}</span></div>
         <div class="row"><span class="label">Volume</span><span class="val">${fmtM(p.regularMarketVolume)}</span></div>
-        <div class="row"><span class="label">Vol. moy. 3M</span><span class="val">${fmtM(sd.averageVolume)}</span></div>
+        <div class="row"><span class="label">Avg Vol. 3M</span><span class="val">${fmtM(sd.averageVolume)}</span></div>
         ${rbar(p.regularMarketDayLow, p.regularMarketDayHigh, price)}
       </div>
-      <div class="section"><h3>52 semaines</h3>
-        <div class="row"><span class="label">Plus haut</span><span class="val up">${cs}${fmt(sd.fiftyTwoWeekHigh)}</span></div>
-        <div class="row"><span class="label">Plus bas</span><span class="val down">${cs}${fmt(sd.fiftyTwoWeekLow)}</span></div>
+      <div class="section"><h3>52 Weeks</h3>
+        <div class="row"><span class="label">High</span><span class="val up">${cs}${fmt(sd.fiftyTwoWeekHigh)}</span></div>
+        <div class="row"><span class="label">Low</span><span class="val down">${cs}${fmt(sd.fiftyTwoWeekLow)}</span></div>
         <div class="row"><span class="label">Perf.</span><span class="val ${cc(ks['52WeekChange'])}">${pct(ks['52WeekChange'])}</span></div>
         ${rbar(sd.fiftyTwoWeekLow, sd.fiftyTwoWeekHigh, price)}
       </div>
-      <div class="section"><h3>Valorisation</h3>
-        <div class="row"><span class="label">Capi.</span><span class="val">${fmtB(p.marketCap)}</span></div>
-        <div class="row"><span class="label">PER trailing</span><span class="val">${fmt(sd.trailingPE)}x</span></div>
-        <div class="row"><span class="label">PER forward</span><span class="val">${fmt(sd.forwardPE)}x</span></div>
-        <div class="row"><span class="label">Prix/Livre</span><span class="val">${fmt(ks.priceToBook)}x</span></div>
-        <div class="row"><span class="label">Bêta</span><span class="val">${fmt(sd.beta)}</span></div>
+      <div class="section"><h3>Valuation</h3>
+        <div class="row"><span class="label">Mkt Cap</span><span class="val">${fmtB(p.marketCap)}</span></div>
+        <div class="row"><span class="label">P/E Trailing</span><span class="val">${fmt(sd.trailingPE)}x</span></div>
+        <div class="row"><span class="label">P/E Forward</span><span class="val">${fmt(sd.forwardPE)}x</span></div>
+        <div class="row"><span class="label">Price/Book</span><span class="val">${fmt(ks.priceToBook)}x</span></div>
+        <div class="row"><span class="label">Beta</span><span class="val">${fmt(sd.beta)}</span></div>
       </div>
       <div class="section"><h3>Analystes (${fd.numberOfAnalystOpinions || '—'})</h3>
-        <div class="row"><span class="label">Recommandation</span><span class="val">${fd.recommendationKey || '—'}</span></div>
-        <div class="row"><span class="label">Objectif médian</span><span class="val">${cs}${fmt(fd.targetMedianPrice)}</span></div>
-        <div class="row"><span class="label">Potentiel</span><span class="val ${price && fd.targetMedianPrice && fd.targetMedianPrice > price ? 'up' : 'down'}">${price && fd.targetMedianPrice ? pct((fd.targetMedianPrice - price) / price) : '—'}</span></div>
-        <div class="row"><span class="label">Fourchette</span><span class="val">${cs}${fmt(fd.targetLowPrice)}–${cs}${fmt(fd.targetHighPrice)}</span></div>
+        <div class="row"><span class="label">Recommendation</span><span class="val">${fd.recommendationKey || '—'}</span></div>
+        <div class="row"><span class="label">Target (median)</span><span class="val">${cs}${fmt(fd.targetMedianPrice)}</span></div>
+        <div class="row"><span class="label">Upside</span><span class="val ${price && fd.targetMedianPrice && fd.targetMedianPrice > price ? 'up' : 'down'}">${price && fd.targetMedianPrice ? pct((fd.targetMedianPrice - price) / price) : '—'}</span></div>
+        <div class="row"><span class="label">Range</span><span class="val">${cs}${fmt(fd.targetLowPrice)}–${cs}${fmt(fd.targetHighPrice)}</span></div>
       </div>
       <div class="section"><h3>Finances</h3>
         <div class="row"><span class="label">CA</span><span class="val">${fmtB(fd.totalRevenue)}</span></div>
-        <div class="row"><span class="label">Croissance CA</span><span class="val ${cc(fd.revenueGrowth)}">${pct(fd.revenueGrowth)}</span></div>
-        <div class="row"><span class="label">Marge nette</span><span class="val ${cc(fd.profitMargins)}">${pct(fd.profitMargins)}</span></div>
-        <div class="row"><span class="label">Free cash-flow</span><span class="val">${fmtB(fd.freeCashflow)}</span></div>
-        <div class="row"><span class="label">Dette/FP</span><span class="val">${fmt(fd.debtToEquity)}x</span></div>
+        <div class="row"><span class="label">Revenue Growth</span><span class="val ${cc(fd.revenueGrowth)}">${pct(fd.revenueGrowth)}</span></div>
+        <div class="row"><span class="label">Net Margin</span><span class="val ${cc(fd.profitMargins)}">${pct(fd.profitMargins)}</span></div>
+        <div class="row"><span class="label">Free Cash Flow</span><span class="val">${fmtB(fd.freeCashflow)}</span></div>
+        <div class="row"><span class="label">Debt/Equity</span><span class="val">${fmt(fd.debtToEquity)}x</span></div>
       </div>
-      <div class="section"><h3>Dividende & actionnariat</h3>
-        <div class="row"><span class="label">Dividende</span><span class="val">${cs}${fmt(sd.dividendRate)}/an</span></div>
-        <div class="row"><span class="label">Rendement</span><span class="val">${pct(sd.dividendYield)}</span></div>
+      <div class="section"><h3>Dividend & actionnariat</h3>
+        <div class="row"><span class="label">Dividend</span><span class="val">${cs}${fmt(sd.dividendRate)}/an</span></div>
+        <div class="row"><span class="label">Yield</span><span class="val">${pct(sd.dividendYield)}</span></div>
         <div class="row"><span class="label">EPS trailing</span><span class="val">${cs}${fmt(ks.trailingEps)}</span></div>
         <div class="row"><span class="label">EPS forward</span><span class="val">${cs}${fmt(ks.forwardEps)}</span></div>
         <div class="row"><span class="label">Institutions</span><span class="val">${pct(ks.heldPercentInstitutions)}</span></div>
@@ -68,8 +69,8 @@ function render(d) {
     </div>
 
     <div class="ai-btn-wrap" id="aiBtnWrap">
-      <button class="ai-btn" id="aiBtn" onclick="aiAnalyze()">Analyser avec l'agent IA</button>
-      <button class="wl-btn" id="wlBtn" onclick="addCurrentToWatchlist()" style="display:none;">+ Ajouter à la watchlist</button>
+      <button class="ai-btn" id="aiBtn" onclick="aiAnalyze()">Analyze with AI Agent</button>
+      <button class="wl-btn" id="wlBtn" onclick="addCurrentToWatchlist()" style="display:none;">+ Add to Watchlist</button>
     </div>
     <div class="ai-block" id="aiBlock">
       <h3>Analyse IA</h3>

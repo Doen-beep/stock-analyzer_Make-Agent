@@ -1,4 +1,4 @@
-/* markdown.js | v1.1 | 2026-05-24 */
+/* markdown.js | v1.2 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -63,16 +63,16 @@ function renderMarkdown(text) {
   // Badges colorés
   html = html
     .replace(/\bExcellent\b/g, '<span class="badge-buy">⭐ Excellent</span>')
-    .replace(/\bBon\b/g, '<span class="badge-buy">👍 Bon</span>')
-    .replace(/\bMoyen\b/g, '<span class="badge-wait">⚠️ Moyen</span>')
-    .replace(/\bMauvais\b/g, '<span class="badge-avoid">❌ Mauvais</span>')
-    .replace(/Juste prix/g, '<span class="badge-wait">⚖️ Juste prix</span>')
-    .replace(/Sous-évalué/g, '<span class="badge-buy">📈 Sous-évalué</span>')
-    .replace(/Surévalué/g, '<span class="badge-avoid">📉 Surévalué</span>')
-    .replace(/Attendre une meilleure entrée/g, '<span class="badge-wait">⏳ Attendre</span>')
-    .replace(/\bAttendre\b/g, '<span class="badge-wait">⏳ Attendre</span>')
-    .replace(/\bÉviter\b/g, '<span class="badge-avoid">✗ Éviter</span>')
-    .replace(/\bAcheter\b/g, '<span class="badge-buy">✅ Acheter</span>');
+    .replace(/\bBon\b/g, '<span class="badge-buy">👍 Good</span>')
+    .replace(/\bMoyen\b/g, '<span class="badge-wait">⚠️ Average</span>')
+    .replace(/\bMauvais\b/g, '<span class="badge-avoid">❌ Poor</span>')
+    .replace(/Juste prix/g, '<span class="badge-wait">⚖️ Fair Value</span>')
+    .replace(/Sous-évalué/g, '<span class="badge-buy">📈 Undervalued</span>')
+    .replace(/Surévalué/g, '<span class="badge-avoid">📉 Overvalued</span>')
+    .replace(/Attendre une meilleure entrée/g, '<span class="badge-wait">⏳ Wait</span>')
+    .replace(/\bAttendre\b/g, '<span class="badge-wait">⏳ Wait</span>')
+    .replace(/\bÉviter\b/g, '<span class="badge-avoid">✗ Avoid</span>')
+    .replace(/\bAcheter\b/g, '<span class="badge-buy">✅ Buy</span>');
 
   return '<div class="ai-body">' + html + '</div>';
 }
@@ -107,9 +107,9 @@ function extractVerdict(text) {
   // Qualité
   const qualities = [
     ['Excellent', 'badge-buy', '⭐ Excellent'],
-    ['Bon', 'badge-buy', '👍 Bon'],
-    ['Moyen', 'badge-wait', '⚠️ Moyen'],
-    ['Mauvais', 'badge-avoid', '❌ Mauvais']
+    ['Bon', 'badge-buy', '👍 Good'],
+    ['Moyen', 'badge-wait', '⚠️ Average'],
+    ['Mauvais', 'badge-avoid', '❌ Poor']
   ];
   for (const [k, cls, label] of qualities) {
     if (text.includes(k)) {
@@ -120,20 +120,20 @@ function extractVerdict(text) {
 
   // Valorisation
   if (text.includes('Sous-évalué')) {
-    document.getElementById('vValuation').innerHTML = '<span class="badge-buy">📈 Sous-évalué</span>';
+    document.getElementById('vValuation').innerHTML = '<span class="badge-buy">📈 Undervalued</span>';
   } else if (text.includes('Juste prix')) {
-    document.getElementById('vValuation').innerHTML = '<span class="badge-wait">⚖️ Juste prix</span>';
+    document.getElementById('vValuation').innerHTML = '<span class="badge-wait">⚖️ Fair Value</span>';
   } else if (text.includes('Surévalué')) {
-    document.getElementById('vValuation').innerHTML = '<span class="badge-avoid">📉 Surévalué</span>';
+    document.getElementById('vValuation').innerHTML = '<span class="badge-avoid">📉 Overvalued</span>';
   }
 
   // Décision
   if (text.includes('Éviter')) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-avoid">✗ Éviter</span>';
+    document.getElementById('vDecision').innerHTML = '<span class="badge-avoid">✗ Avoid</span>';
   } else if (text.includes('Attendre')) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-wait">⏳ Attendre</span>';
+    document.getElementById('vDecision').innerHTML = '<span class="badge-wait">⏳ Wait</span>';
   } else if (text.includes('Acheter')) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-buy">✅ Acheter</span>';
+    document.getElementById('vDecision').innerHTML = '<span class="badge-buy">✅ Buy</span>';
   }
 
   // Prix cible
@@ -148,7 +148,7 @@ function extractVerdict(text) {
     if (m && m[1].trim().length > 1) {
       target = m[1].trim();
       const vt = document.getElementById('vTarget');
-      vt.innerHTML = `Prix cible d'entrée : <span style="color:var(--accent);font-weight:500;">${target}</span>`;
+      vt.innerHTML = `Entry target price: <span style="color:var(--accent);font-weight:500;">${target}</span>`;
       vt.style.display = 'block';
       break;
     }

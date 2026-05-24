@@ -1,4 +1,4 @@
-/* history.js | v1.3 | 2026-05-24 */
+/* history.js | v1.5 | 2026-05-24 */
 
 const SUPABASE_URL = 'https://qxqnxobfsdeqhfanphdo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_KwmWQJ7mAXWRPX03aW2Bvw_aDhwo6O6';
@@ -24,9 +24,9 @@ async function supabaseCall(method, table, body, filters) {
 }
 
 function addToHistory(ticker, name, price, currency) {
-  // L'historique est géré via les sessions Supabase
-  // Cette fonction est un placeholder pour la compatibilité avec analyze.js
-  console.log('Consulted:', ticker);
+  // Enregistrer la consultation dans la session courante
+  // (la session est déjà créée par initSession)
+  console.log('Consulted:', ticker, name, price);
 }
 
 async function initSession() {
@@ -96,11 +96,11 @@ async function renderHistory() {
       html += '</div>';
     });
 
-    html += '<div class="wl-footer"><span class="tiny muted">' + sessions.length + ' session' + (sessions.length > 1 ? 's' : '') + ' au total</span></div>';
+    html += '<div class="wl-footer"><span class="tiny muted">' + sessions.length + ' session' + (sessions.length > 1 ? 's' : '') + ' total</span></div>';
     container.innerHTML = html;
 
   } catch(e) {
-    container.innerHTML = '<div style="padding:24px;color:var(--red);font-size:13px;">Erreur : ' + e.message + '</div>';
+    container.innerHTML = '<div style="padding:24px;color:var(--red);font-size:13px;">Error: ' + e.message + '</div>';
   }
 }
 

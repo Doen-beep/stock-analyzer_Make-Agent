@@ -1,4 +1,4 @@
-/* watchlist.js | v1.1 | 2026-05-24 */
+/* watchlist.js | v1.3 | 2026-05-24 */
 const WATCHLIST_KEY = 'stock_watchlist';
 
 function getWatchlist() {
@@ -56,8 +56,8 @@ function renderWatchlist() {
   if (!list.length) {
     container.innerHTML = `
       <div style="text-align:center;padding:64px 24px;color:var(--muted);font-size:13px;line-height:2;">
-        Aucune entreprise dans la watchlist.<br>
-        <span style="font-size:12px;opacity:0.6">Analysez une action → cliquez "+ Ajouter à la watchlist"</span>
+        No stocks in your watchlist yet.<br>
+        <span style="font-size:12px;opacity:0.6">Analysez une action → cliquez "+ Add to Watchlist"</span>
       </div>`;
     return;
   }
@@ -67,14 +67,14 @@ function renderWatchlist() {
       <table class="wl-table">
         <thead>
           <tr>
-            <th>Entreprise</th>
-            <th class="num">Prix ajouté</th>
-            <th class="num">Prix actuel</th>
-            <th class="num">Variation</th>
-            <th class="ctr">Qualité</th>
-            <th class="ctr">Valorisation</th>
-            <th class="ctr">Décision</th>
-            <th class="num">Cible</th>
+            <th>Company</th>
+            <th class="num">Price Added</th>
+            <th class="num">Current Price</th>
+            <th class="num">Change</th>
+            <th class="ctr">Quality</th>
+            <th class="ctr">Valuation</th>
+            <th class="ctr">Decision</th>
+            <th class="num">Target</th>
             <th class="ctr">Analyse le</th>
             <th></th>
           </tr>
@@ -108,8 +108,8 @@ function renderWatchlist() {
       </table>
     </div>
     <div class="wl-footer">
-      <span class="tiny muted">${list.length} entreprise${list.length > 1 ? 's' : ''}</span>
-      <button class="wl-refresh" onclick="refreshWatchlistPrices()">↻ Actualiser les prix</button>
+      <span class="tiny muted">${list.length} stock${list.length > 1 ? 's' : ''}</span>
+      <button class="wl-refresh" onclick="refreshWatchlistPrices()">↻ Refresh Prices</button>
     </div>
   `;
 }
@@ -118,7 +118,7 @@ async function refreshWatchlistPrices() {
   const list = getWatchlist();
   if (!list.length) return;
   const btn = document.querySelector('.wl-refresh');
-  if (btn) { btn.textContent = '↻ En cours…'; btn.disabled = true; }
+  if (btn) { btn.textContent = '↻ Updating…'; btn.disabled = true; }
 
   for (const entry of list) {
     try {
@@ -135,7 +135,7 @@ async function refreshWatchlistPrices() {
 
   saveWatchlist(list);
   renderWatchlist();
-  if (btn) { btn.textContent = '↻ Actualiser les prix'; btn.disabled = false; }
+  if (btn) { btn.textContent = '↻ Refresh Prices'; btn.disabled = false; }
 }
 
 function loadFromWatchlist(ticker) {
@@ -160,3 +160,6 @@ function showAnalyzeTab() {
   document.getElementById('watchlistView').style.display = 'none';
   document.getElementById('historyView') && (document.getElementById('historyView').style.display = 'none');
 }
+
+// Initialiser le compteur au chargement
+document.addEventListener("DOMContentLoaded", function() { updateWlCount(); });

@@ -1,4 +1,4 @@
-/* analyze.js | v1.1 | 2026-05-24 */
+/* analyze.js | v1.2 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -15,14 +15,14 @@ async function analyze() {
   errorEl.style.display = 'none';
   lastData = null;
   status.className = 'status loading';
-  status.textContent = 'Chargement de ' + ticker + '…';
+  status.textContent = 'Loading ' + ticker + '…';
 
   try {
     const res = await fetch(WEBHOOK + '?symbol=' + encodeURIComponent(ticker) + '&region=' + getRegion(ticker));
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     const data = json.data || json;
-    if (!data.price) throw new Error('Données invalides reçues');
+    if (!data.price) throw new Error('Invalid data received');
 
     lastData = data;
     // Enregistrer dans l'historique
@@ -36,7 +36,7 @@ async function analyze() {
   } catch (e) {
     status.className = 'status';
     status.textContent = '';
-    errorEl.textContent = 'Erreur : ' + e.message;
+    errorEl.textContent = 'Error: ' + e.message;
     errorEl.style.display = 'block';
   } finally {
     btn.disabled = false;
@@ -52,7 +52,7 @@ async function aiAnalyze() {
 
   aiBtn.disabled = true;
   aiBlock.style.display = 'block';
-  aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">Analyse en cours…</span>';
+  aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">Analyzing…</span>';
 
   const p  = lastData.price || {};
   const sd = lastData.summaryDetail || {};
@@ -95,7 +95,7 @@ async function aiAnalyze() {
       || json?.data?.output_text
       || (typeof json === 'string' ? json : null);
 
-    if (!text) throw new Error('Réponse vide');
+    if (!text) throw new Error('Empty response');
 
     aiText.innerHTML = renderMarkdown(text);
     const verdict = extractVerdict(text);
@@ -109,7 +109,7 @@ async function aiAnalyze() {
     }
 
   } catch (e) {
-    aiText.innerHTML = `<span style="color:var(--red)">Erreur : ${e.message}</span>`;
+    aiText.innerHTML = `<span style="color:var(--red)">Error: ${e.message}</span>`;
   } finally {
     aiBtn.disabled = false;
   }
