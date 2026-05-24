@@ -1,4 +1,4 @@
-/* style.css | v1.8 | 2026-05-24 */
+/* style.css | v1.9 | 2026-05-24 */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -242,3 +242,17 @@ footer { margin-top:48px; font-family:var(--mono); font-size:11px; color:var(--m
   line-height:1.5;
   box-shadow:0 4px 16px rgba(0,0,0,0.4);
 }
+
+/* Catégories watchlist */
+.wl-cats { display:flex; gap:8px; flex-wrap:wrap; padding:14px 16px; border-bottom:1px solid var(--border); }
+.wl-cat { font-family:var(--mono); font-size:11px; letter-spacing:0.06em; padding:5px 12px; border-radius:20px; border:1px solid var(--border); color:var(--muted); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:6px; }
+.wl-cat:hover { border-color:var(--accent); color:var(--accent); }
+.wl-cat-active { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); font-weight:500; }
+.wl-cat-count { font-size:10px; background:var(--border); padding:1px 6px; border-radius:10px; }
+.wl-cat-active .wl-cat-count { background:var(--accent); color:#fff; }
+.wl-cat-del { font-size:10px; opacity:0.5; transition:opacity 0.15s; }
+.wl-cat-del:hover { opacity:1; color:var(--red); }
+.wl-cat-add { border-style:dashed; color:var(--muted); }
+.wl-cat-add:hover { border-color:var(--green); color:var(--green); }
+.wl-cat-select { background:var(--surface); border:1px solid var(--border); color:var(--muted); font-family:var(--mono); font-size:11px; padding:3px 6px; border-radius:4px; cursor:pointer; }
+.wl-cat-select:focus { outline:none; border-color:var(--accent); }
