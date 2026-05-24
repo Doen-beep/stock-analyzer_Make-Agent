@@ -1,4 +1,4 @@
-/* watchlist.js | v1.5 | 2026-05-24 */
+/* watchlist.js | v1.6 | 2026-05-24 */
 const WATCHLIST_KEY = 'stock_watchlist';
 
 function updateWlCount() {
@@ -86,8 +86,8 @@ function renderWatchlist() {
             <th class="ctr">Quality</th>
             <th class="ctr">Valuation</th>
             <th class="ctr">Decision</th>
-            <th class="num">Target</th>
-            <th class="ctr">Analyse le</th>
+            <th class="num">Entry Target</th>
+            <th class="ctr">Analyzed on</th>
             <th></th>
           </tr>
         </thead>
