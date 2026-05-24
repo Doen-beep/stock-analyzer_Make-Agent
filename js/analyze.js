@@ -92,11 +92,30 @@ async function aiAnalyze() {
     if (!text) throw new Error('Réponse vide');
 
     aiText.innerHTML = renderMarkdown(text);
-    extractVerdict(text);
+    const verdict = extractVerdict(text);
+    // Afficher le bouton watchlist et stocker le verdict
+    const wlBtn = document.getElementById('wlBtn');
+    if (wlBtn) {
+      wlBtn.style.display = 'block';
+      wlBtn.classList.remove('added');
+      wlBtn.textContent = '+ Ajouter à la watchlist';
+      window._lastVerdict = verdict;
+    }
 
   } catch (e) {
     aiText.innerHTML = `<span style="color:var(--red)">Erreur : ${e.message}</span>`;
   } finally {
     aiBtn.disabled = false;
   }
+}
+
+function addCurrentToWatchlist() {
+  if (!lastData || !window._lastVerdict) return;
+  addToWatchlist(lastData, window._lastVerdict);
+  const wlBtn = document.getElementById('wlBtn');
+  if (wlBtn) {
+    wlBtn.classList.add('added');
+    wlBtn.textContent = '✓ Ajouté à la watchlist';
+  }
+  updateWlCount();
 }
