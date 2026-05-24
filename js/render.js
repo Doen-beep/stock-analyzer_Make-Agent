@@ -1,82 +1,153 @@
-function render(d) {
-  const p  = d.price || {};
-  const sd = d.summaryDetail || {};
-  const fd = d.financialData || {};
-  const ks = d.defaultKeyStatistics || {};
+function renderMarkdown(text) {
+  if (!text) return '';
+  const lines = text.split('\n');
+  let html = '';
+  let inTable = false;
+  let tableRows = [];
 
-  const sym   = p.symbol || '—';
-  const name  = p.shortName || sym;
-  const price = p.regularMarketPrice;
-  const chg   = p.regularMarketChange;
-  const currency = p.currency || sd.currency || 'USD';
-  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','HKD':'HK$','AUD':'A$'}[currency] || currency+' ';
+  function flushTable() {
+    if (!tableRows.length) return;
+    const dataRows = tableRows.filter(r => !r.match(/^\|[-| :]+\|$/));
+    if (dataRows.length < 2) { tableRows = []; return; }
+    const headers = dataRows[0].split('|').filter(s => s.trim());
+    const ths = headers.map(s => '<th>' + s.trim() + '</th>').join('');
+    let trs = '';
+    for (let r = 1; r < dataRows.length; r++) {
+      const cells = dataRows[r].split('|').filter(s => s.trim());
+      trs += '<tr>' + cells.map(s => '<td>' + s.trim() + '</td>').join('') + '</tr>';
+    }
+    html += '<table><thead><tr>' + ths + '</tr></thead><tbody>' + trs + '</tbody></table>';
+    tableRows = [];
+  }
 
-  document.getElementById('card').innerHTML = `
-    <div class="card-header">
-      <div class="ticker-name">
-        <h2>${sym}</h2>
-        <p>${name}</p>
-        ${recBadge(fd.recommendationKey)}
-      </div>
-      <div class="price-block">
-        <div class="price">${cs}${fmt(price)}</div>
-        <div class="change ${cc(chg)}">${chg >= 0 ? '+' : ''}${fmt(chg)} (${pct(p.regularMarketChangePercent)})</div>
-        ${p.postMarketPrice ? `<div class="change ${cc(p.postMarketChange)}" style="font-size:11px;margin-top:2px">After-hours ${cs}${fmt(p.postMarketPrice)} ${p.postMarketChange >= 0 ? '+' : ''}${fmt(p.postMarketChange)}</div>` : ''}
-      </div>
-    </div>
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    let line = raw
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
 
-    <div class="grid">
-      <div class="section"><h3>Séance</h3>
-        <div class="row"><span class="label">Ouverture</span><span class="val">${cs}${fmt(p.regularMarketOpen)}</span></div>
-        <div class="row"><span class="label">Volume</span><span class="val">${fmtM(p.regularMarketVolume)}</span></div>
-        <div class="row"><span class="label">Vol. moy. 3M</span><span class="val">${fmtM(sd.averageVolume)}</span></div>
-        ${rbar(p.regularMarketDayLow, p.regularMarketDayHigh, price)}
-      </div>
-      <div class="section"><h3>52 semaines</h3>
-        <div class="row"><span class="label">Plus haut</span><span class="val up">${cs}${fmt(sd.fiftyTwoWeekHigh)}</span></div>
-        <div class="row"><span class="label">Plus bas</span><span class="val down">${cs}${fmt(sd.fiftyTwoWeekLow)}</span></div>
-        <div class="row"><span class="label">Perf.</span><span class="val ${cc(ks['52WeekChange'])}">${pct(ks['52WeekChange'])}</span></div>
-        ${rbar(sd.fiftyTwoWeekLow, sd.fiftyTwoWeekHigh, price)}
-      </div>
-      <div class="section"><h3>Valorisation</h3>
-        <div class="row"><span class="label">Capi.</span><span class="val">${fmtB(p.marketCap)}</span></div>
-        <div class="row"><span class="label">PER trailing</span><span class="val">${fmt(sd.trailingPE)}x</span></div>
-        <div class="row"><span class="label">PER forward</span><span class="val">${fmt(sd.forwardPE)}x</span></div>
-        <div class="row"><span class="label">Prix/Livre</span><span class="val">${fmt(ks.priceToBook)}x</span></div>
-        <div class="row"><span class="label">Bêta</span><span class="val">${fmt(sd.beta)}</span></div>
-      </div>
-      <div class="section"><h3>Analystes (${fd.numberOfAnalystOpinions || '—'})</h3>
-        <div class="row"><span class="label">Recommandation</span><span class="val">${fd.recommendationKey || '—'}</span></div>
-        <div class="row"><span class="label">Objectif médian</span><span class="val">${cs}${fmt(fd.targetMedianPrice)}</span></div>
-        <div class="row"><span class="label">Potentiel</span><span class="val ${price && fd.targetMedianPrice && fd.targetMedianPrice > price ? 'up' : 'down'}">${price && fd.targetMedianPrice ? pct((fd.targetMedianPrice - price) / price) : '—'}</span></div>
-        <div class="row"><span class="label">Fourchette</span><span class="val">${cs}${fmt(fd.targetLowPrice)}–${cs}${fmt(fd.targetHighPrice)}</span></div>
-      </div>
-      <div class="section"><h3>Finances</h3>
-        <div class="row"><span class="label">CA</span><span class="val">${fmtB(fd.totalRevenue)}</span></div>
-        <div class="row"><span class="label">Croissance CA</span><span class="val ${cc(fd.revenueGrowth)}">${pct(fd.revenueGrowth)}</span></div>
-        <div class="row"><span class="label">Marge nette</span><span class="val ${cc(fd.profitMargins)}">${pct(fd.profitMargins)}</span></div>
-        <div class="row"><span class="label">Free cash-flow</span><span class="val">${fmtB(fd.freeCashflow)}</span></div>
-        <div class="row"><span class="label">Dette/FP</span><span class="val">${fmt(fd.debtToEquity)}x</span></div>
-      </div>
-      <div class="section"><h3>Dividende & actionnariat</h3>
-        <div class="row"><span class="label">Dividende</span><span class="val">${cs}${fmt(sd.dividendRate)}/an</span></div>
-        <div class="row"><span class="label">Rendement</span><span class="val">${pct(sd.dividendYield)}</span></div>
-        <div class="row"><span class="label">EPS trailing</span><span class="val">${cs}${fmt(ks.trailingEps)}</span></div>
-        <div class="row"><span class="label">EPS forward</span><span class="val">${cs}${fmt(ks.forwardEps)}</span></div>
-        <div class="row"><span class="label">Institutions</span><span class="val">${pct(ks.heldPercentInstitutions)}</span></div>
-      </div>
-    </div>
+    if (raw.startsWith('|')) {
+      if (!inTable) inTable = true;
+      tableRows.push(raw);
+      continue;
+    }
 
-    <div class="ai-btn-wrap" id="aiBtnWrap">
-      <button class="ai-btn" id="aiBtn" onclick="aiAnalyze()">Analyser avec l'agent IA</button>
-      <button class="wl-btn" id="wlBtn" onclick="addCurrentToWatchlist()" style="display:none;">+ Ajouter à la watchlist</button>
-    </div>
-    <div class="ai-block" id="aiBlock">
-      <h3>Analyse IA</h3>
-      <div class="ai-text" id="aiText"></div>
-    </div>
-  `;
+    if (inTable) {
+      inTable = false;
+      flushTable();
+    }
 
-  document.getElementById('card').style.display = 'block';
-  document.getElementById('aiBtnWrap').style.display = 'block';
+    if (raw.startsWith('## ')) {
+      html += '<h2>' + line.slice(3) + '</h2>';
+    } else if (raw.startsWith('### ')) {
+      html += '<h3>' + line.slice(4) + '</h3>';
+    } else if (raw.startsWith('# ')) {
+      html += '<h2>' + line.slice(2) + '</h2>';
+    } else if (raw.match(/^ÉTAPE \d/)) {
+      html += '<h2>' + line + '</h2>';
+    } else if (raw.match(/^[-•*] /)) {
+      html += '<li>' + line.replace(/^[-•*] /, '') + '</li>';
+    } else if (!raw.trim()) {
+      html += '<br>';
+    } else {
+      html += '<p>' + line + '</p>';
+    }
+  }
+
+  if (inTable) flushTable();
+
+  // Badges colorés
+  html = html
+    .replace(/\bExcellent\b/g, '<span class="badge-buy">⭐ Excellent</span>')
+    .replace(/\bBon\b/g, '<span class="badge-buy">👍 Bon</span>')
+    .replace(/\bMoyen\b/g, '<span class="badge-wait">⚠️ Moyen</span>')
+    .replace(/\bMauvais\b/g, '<span class="badge-avoid">❌ Mauvais</span>')
+    .replace(/Juste prix/g, '<span class="badge-wait">⚖️ Juste prix</span>')
+    .replace(/Sous-évalué/g, '<span class="badge-buy">📈 Sous-évalué</span>')
+    .replace(/Surévalué/g, '<span class="badge-avoid">📉 Surévalué</span>')
+    .replace(/Attendre une meilleure entrée/g, '<span class="badge-wait">⏳ Attendre</span>')
+    .replace(/\bAttendre\b/g, '<span class="badge-wait">⏳ Attendre</span>')
+    .replace(/\bÉviter\b/g, '<span class="badge-avoid">✗ Éviter</span>')
+    .replace(/\bAcheter\b/g, '<span class="badge-buy">✅ Acheter</span>');
+
+  return '<div class="ai-body">' + html + '</div>';
+}
+
+function extractVerdict(text) {
+  // Créer ou récupérer le bandeau
+  let banner = document.getElementById('verdictBanner');
+  if (!banner) {
+    const cardHeader = document.querySelector('.card-header');
+    if (!cardHeader) return;
+    banner = document.createElement('div');
+    banner.id = 'verdictBanner';
+    banner.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid var(--border);';
+    banner.innerHTML = `
+      <div style="padding:16px 12px;text-align:center;border-right:0.5px solid var(--border);">
+        <div class="vc-label">Qualité</div>
+        <div id="vQuality" class="vc-value">—</div>
+      </div>
+      <div style="padding:16px 12px;text-align:center;border-right:0.5px solid var(--border);">
+        <div class="vc-label">Valorisation</div>
+        <div id="vValuation" class="vc-value">—</div>
+      </div>
+      <div style="padding:16px 12px;text-align:center;">
+        <div class="vc-label">Décision</div>
+        <div id="vDecision" class="vc-value">—</div>
+      </div>
+      <div id="vTarget" style="display:none;grid-column:1/-1;padding:10px 12px;text-align:center;border-top:0.5px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);"></div>
+    `;
+    cardHeader.insertAdjacentElement('afterend', banner);
+  }
+
+  // Qualité
+  const qualities = [
+    ['Excellent', 'badge-buy', '⭐ Excellent'],
+    ['Bon', 'badge-buy', '👍 Bon'],
+    ['Moyen', 'badge-wait', '⚠️ Moyen'],
+    ['Mauvais', 'badge-avoid', '❌ Mauvais']
+  ];
+  for (const [k, cls, label] of qualities) {
+    if (text.includes(k)) {
+      document.getElementById('vQuality').innerHTML = `<span class="${cls}">${label}</span>`;
+      break;
+    }
+  }
+
+  // Valorisation
+  if (text.includes('Sous-évalué')) {
+    document.getElementById('vValuation').innerHTML = '<span class="badge-buy">📈 Sous-évalué</span>';
+  } else if (text.includes('Juste prix')) {
+    document.getElementById('vValuation').innerHTML = '<span class="badge-wait">⚖️ Juste prix</span>';
+  } else if (text.includes('Surévalué')) {
+    document.getElementById('vValuation').innerHTML = '<span class="badge-avoid">📉 Surévalué</span>';
+  }
+
+  // Décision
+  if (text.includes('Éviter')) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-avoid">✗ Éviter</span>';
+  } else if (text.includes('Attendre')) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-wait">⏳ Attendre</span>';
+  } else if (text.includes('Acheter')) {
+    document.getElementById('vDecision').innerHTML = '<span class="badge-buy">✅ Acheter</span>';
+  }
+
+  // Prix cible
+  const patterns = [
+    /prix\s+(?:cible|d.entr[eé]e)[^$\d]*([$]?\s*[\d.,]+)/i,
+    /entr[eé]e\s*(?:à|:)\s*([$]?\s*[\d.,]+)/i,
+    /cible\s*(?:à|:)\s*([$]?\s*[\d.,]+)/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m && m[1].trim().length > 1) {
+      const vt = document.getElementById('vTarget');
+      vt.innerHTML = `Prix cible d'entrée : <span style="color:var(--accent);font-weight:500;">${m[1].trim()}</span>`;
+      vt.style.display = 'block';
+      break;
+    }
+  }
 }
