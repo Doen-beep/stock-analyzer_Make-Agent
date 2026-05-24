@@ -14,25 +14,43 @@
   <p>Données via Make · Analyse par OpenAI</p>
 </header>
 
-<div class="search-box">
-  <div class="input-row">
-    <input type="text" id="ticker" placeholder="Entrez un ticker…" maxlength="10"/>
-    <button id="btn" onclick="analyze()">Analyser</button>
-  </div>
-  <div class="chips">
-    <button class="chip" onclick="setTicker('AAPL')">AAPL</button>
-    <button class="chip" onclick="setTicker('TSLA')">TSLA</button>
-    <button class="chip" onclick="setTicker('MSFT')">MSFT</button>
-    <button class="chip" onclick="setTicker('GOOGL')">GOOGL</button>
-    <button class="chip" onclick="setTicker('NVDA')">NVDA</button>
-    <button class="chip" onclick="setTicker('AMZN')">AMZN</button>
-    <button class="chip" onclick="setTicker('META')">META</button>
-  </div>
+<!-- Onglets -->
+<div class="tabs">
+  <button id="tabAnalyze" class="tab tab-active" onclick="showAnalyzeTab()">Analyser</button>
+  <button id="tabWatchlist" class="tab" onclick="showWatchlistTab()">Ma Watchlist <span id="wlCount"></span></button>
 </div>
 
-<div class="status" id="status"></div>
-<div class="error-msg" id="error"></div>
-<div class="card" id="card"></div>
+<!-- Vue Analyser -->
+<div id="analyzeView">
+  <div class="search-box">
+    <div class="input-row">
+      <input type="text" id="ticker" placeholder="Nom ou ticker…" maxlength="15"/>
+      <button id="btn" onclick="analyze()">Analyser</button>
+    </div>
+    <div class="chips">
+      <button class="chip" onclick="setTicker('AAPL')">AAPL</button>
+      <button class="chip" onclick="setTicker('TSLA')">TSLA</button>
+      <button class="chip" onclick="setTicker('MSFT')">MSFT</button>
+      <button class="chip" onclick="setTicker('GOOGL')">GOOGL</button>
+      <button class="chip" onclick="setTicker('NVDA')">NVDA</button>
+      <button class="chip" onclick="setTicker('AMZN')">AMZN</button>
+      <button class="chip" onclick="setTicker('META')">META</button>
+    </div>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="error-msg" id="error"></div>
+  <div class="card" id="card"></div>
+</div>
+
+<!-- Vue Watchlist -->
+<div id="watchlistView" style="display:none;width:100%;max-width:900px;">
+  <div class="card" style="display:block;margin-top:16px;">
+    <div style="padding:16px 24px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#a09cc0;">
+      Ma Watchlist
+    </div>
+    <div id="watchlistContent"></div>
+  </div>
+</div>
 
 <footer>Données à titre indicatif · Pas de conseil financier</footer>
 
@@ -42,10 +60,19 @@
 <script src="js/render.js"></script>
 <script src="js/search.js"></script>
 <script src="js/analyze.js"></script>
+<script src="js/watchlist.js"></script>
 <script>
   function setTicker(s) { document.getElementById('ticker').value = s; closeDropdown(); analyze(); }
-  initSearch();
   document.getElementById('ticker').addEventListener('keydown', e => { if (e.key === 'Enter') analyze(); });
+  initSearch();
+
+  // Mettre à jour le compteur watchlist
+  function updateWlCount() {
+    const n = JSON.parse(localStorage.getItem('stock_watchlist') || '[]').length;
+    const el = document.getElementById('wlCount');
+    if (el) el.textContent = n ? `(${n})` : '';
+  }
+  updateWlCount();
 </script>
 
 </body>
