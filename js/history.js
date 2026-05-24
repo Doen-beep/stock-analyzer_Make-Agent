@@ -1,4 +1,4 @@
-/* history.js | v1.2 | 2026-05-24 */
+/* history.js | v1.3 | 2026-05-24 */
 
 const SUPABASE_URL = 'https://qxqnxobfsdeqhfanphdo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_KwmWQJ7mAXWRPX03aW2Bvw_aDhwo6O6';
@@ -21,6 +21,12 @@ async function supabaseCall(method, table, body, filters) {
   if (!res.ok) throw new Error(await res.text());
   if (method === 'DELETE' || method === 'PATCH') return null;
   return res.json();
+}
+
+function addToHistory(ticker, name, price, currency) {
+  // L'historique est géré via les sessions Supabase
+  // Cette fonction est un placeholder pour la compatibilité avec analyze.js
+  console.log('Consulted:', ticker);
 }
 
 async function initSession() {
