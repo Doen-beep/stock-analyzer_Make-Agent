@@ -1,5 +1,11 @@
-/* watchlist.js | v1.4 | 2026-05-24 */
+/* watchlist.js | v1.5 | 2026-05-24 */
 const WATCHLIST_KEY = 'stock_watchlist';
+
+function updateWlCount() {
+  const n = getWatchlist().length;
+  const el = document.getElementById('wlCount');
+  if (el) el.textContent = n ? '(' + n + ')' : '';
+}
 
 function getWatchlist() {
   try { return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'); }
