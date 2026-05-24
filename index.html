@@ -1,3 +1,4 @@
+<!-- index.html | v1.1 | 2026-05-24 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -17,7 +18,8 @@
 <!-- Onglets -->
 <div class="tabs">
   <button id="tabAnalyze" class="tab tab-active" onclick="showAnalyzeTab()">Analyser</button>
-  <button id="tabWatchlist" class="tab" onclick="showWatchlistTab()">Ma Watchlist <span id="wlCount"></span></button>
+  <button id="tabWatchlist" class="tab" onclick="showWatchlistTab()">Watchlist <span id="wlCount"></span></button>
+  <button id="tabHistory" class="tab" onclick="showHistoryTab()">Historique <span id="histCount"></span></button>
 </div>
 
 <!-- Vue Analyser -->
@@ -43,12 +45,18 @@
 </div>
 
 <!-- Vue Watchlist -->
-<div id="watchlistView" style="display:none;width:100%;max-width:900px;">
+<div id="watchlistView" style="display:none;width:100%;max-width:1100px;">
   <div class="card" style="display:block;margin-top:16px;">
-    <div style="padding:16px 24px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#a09cc0;">
-      Ma Watchlist
-    </div>
+    <div class="view-header">Ma Watchlist</div>
     <div id="watchlistContent"></div>
+  </div>
+</div>
+
+<!-- Vue Historique -->
+<div id="historyView" style="display:none;width:100%;max-width:700px;">
+  <div class="card" style="display:block;margin-top:16px;">
+    <div class="view-header">Historique des consultations</div>
+    <div id="historyContent"></div>
   </div>
 </div>
 
@@ -61,18 +69,13 @@
 <script src="js/search.js"></script>
 <script src="js/analyze.js"></script>
 <script src="js/watchlist.js"></script>
+<script src="js/history.js"></script>
 <script>
   function setTicker(s) { document.getElementById('ticker').value = s; closeDropdown(); analyze(); }
   document.getElementById('ticker').addEventListener('keydown', e => { if (e.key === 'Enter') analyze(); });
   initSearch();
-
-  // Mettre à jour le compteur watchlist
-  function updateWlCount() {
-    const n = JSON.parse(localStorage.getItem('stock_watchlist') || '[]').length;
-    const el = document.getElementById('wlCount');
-    if (el) el.textContent = n ? `(${n})` : '';
-  }
   updateWlCount();
+  updateHistoryCount();
 </script>
 
 </body>
