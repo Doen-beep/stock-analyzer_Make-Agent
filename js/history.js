@@ -1,4 +1,4 @@
-/* history.js | v1.9 | 2026-05-24 */
+/* history.js | v2.0 | 2026-05-24 */
 
 const SUPABASE_URL = 'https://qxqnxobfsdeqhfanphdo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_KwmWQJ7mAXWRPX03aW2Bvw_aDhwo6O6';
@@ -31,7 +31,7 @@ function addToHistory(ticker, name, price, currency) {
 
 async function initSession() {
   try {
-    const geo = await fetch('https://ipapi.co/json/').then(r => r.json());
+    const geo = await fetch('http://ip-api.com/json/?fields=status,country,countryCode,city,org,timezone,query').then(r => r.json());
     const now = new Date();
     // Filtrer les IPs de bots connus
     const botCities = ['santa clara', 'ashburn', 'boydton', 'des moines', 'council bluffs', 'the dalles'];
@@ -46,11 +46,11 @@ async function initSession() {
     }
 
     const session = {
-      ip: geo.ip || 'unknown',
+      ip: geo.query || 'unknown',
       city: geo.city || 'unknown',
-      country: geo.country_name || 'unknown',
-      country_code: (geo.country_code || '').toLowerCase(),
-      org: geo.org || geo.asn || 'unknown',
+      country: geo.country || 'unknown',
+      country_code: (geo.countryCode || '').toLowerCase(),
+      org: geo.org || 'unknown',
       timezone: geo.timezone || '—',
       date: now.toLocaleDateString('en-GB'),
       time: now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}),
