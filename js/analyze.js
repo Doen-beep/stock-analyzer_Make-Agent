@@ -1,4 +1,4 @@
-/* analyze.js | v1.0 | 2026-05-24 */
+/* analyze.js | v1.1 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -25,6 +25,11 @@ async function analyze() {
     if (!data.price) throw new Error('Données invalides reçues');
 
     lastData = data;
+    // Enregistrer dans l'historique
+    const p = data.price || {};
+    const currency = p.currency || 'USD';
+    const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','KRW':'₩','SGD':'S$','INR':'₹'}[currency] || currency+' ';
+    addToHistory(p.symbol || ticker, p.shortName || ticker, p.regularMarketPrice, cs);
     status.className = 'status';
     status.textContent = '✓ ' + ticker + ' · ' + new Date().toLocaleTimeString('fr-FR');
     render(data);
