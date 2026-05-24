@@ -1,4 +1,4 @@
-/* search.js | v1.1 | 2026-05-24 */
+/* search.js | v1.2 | 2026-05-24 */
 let allCompanies = [];
 let searchOpen = false;
 let searchTimeout = null;
@@ -6,15 +6,18 @@ let searchTimeout = null;
 // Charger les données immédiatement
 (async function loadData() {
   try {
-    const [sp500, nasdaq, stoxx, euronext, asia] = await Promise.all([
+    const [sp500, nasdaq, stoxx, euronext, asia, euronextParis, xetra, six] = await Promise.all([
       fetch('data/sp500.json').then(r => r.json()),
       fetch('data/nasdaq.json').then(r => r.json()),
       fetch('data/stoxx600.json').then(r => r.json()),
       fetch('data/euronext.json').then(r => r.json()),
       fetch('data/asia.json').then(r => r.json()),
+      fetch('data/euronext-paris.json').then(r => r.json()),
+      fetch('data/xetra.json').then(r => r.json()),
+      fetch('data/six.json').then(r => r.json()),
     ]);
     const seen = new Set();
-    [...sp500, ...nasdaq, ...stoxx, ...euronext, ...asia].forEach(c => {
+    [...sp500, ...nasdaq, ...stoxx, ...euronext, ...asia, ...euronextParis, ...xetra, ...six].forEach(c => {
       if (!seen.has(c.ticker)) { seen.add(c.ticker); allCompanies.push(c); }
     });
     console.log('Search data loaded:', allCompanies.length, 'companies');
