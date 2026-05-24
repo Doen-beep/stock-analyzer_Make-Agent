@@ -1,4 +1,4 @@
-/* analyze.js | v1.2 | 2026-05-24 */
+/* analyze.js | v1.3 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
