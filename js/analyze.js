@@ -117,11 +117,12 @@ async function aiAnalyze() {
 
 function addCurrentToWatchlist() {
   if (!lastData || !window._lastVerdict) return;
-  addToWatchlist(lastData, window._lastVerdict);
+  const isUpdate = addToWatchlist(lastData, window._lastVerdict);
   const wlBtn = document.getElementById('wlBtn');
   if (wlBtn) {
     wlBtn.classList.add('added');
-    wlBtn.textContent = '✓ Ajouté à la watchlist';
+    wlBtn.textContent = isUpdate ? '✓ Watchlist Updated' : '✓ Added to Watchlist';
   }
   updateWlCount();
+  setTimeout(() => showWatchlistTab(), 800);
 }
