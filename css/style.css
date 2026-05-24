@@ -1,3 +1,4 @@
+/* style.css | v1.2 | 2026-05-24 */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -140,4 +141,43 @@ footer { margin-top:48px; font-family:var(--mono); font-size:11px; color:var(--m
 .wl-btn { width:100%; padding:10px; background:none; border:1px solid rgba(124,106,247,0.4); border-radius:5px; cursor:pointer; font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); transition:all 0.15s; margin-top:8px; }
 .wl-btn:hover { background:var(--accent-dim); }
 .wl-btn.added { border-color:var(--green); color:var(--green); }
-.wl-row:hover td { background:rgba(124,106,247,0.05); }
+
+/* Tableau watchlist */
+#watchlistView { width:100%; max-width:1100px; flex-direction:column; align-items:center; }
+.wl-table-wrap { width:100%; overflow-x:auto; }
+.wl-table { width:100%; border-collapse:collapse; font-size:13px; min-width:700px; }
+.wl-table thead tr { border-bottom:1px solid var(--border); }
+.wl-table th { font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#a09cc0; padding:12px 10px; font-weight:500; }
+.wl-table th.num, .wl-table td.num { text-align:right; }
+.wl-table th.ctr, .wl-table td.ctr { text-align:center; }
+.wl-table tbody tr { border-bottom:0.5px solid var(--border); cursor:pointer; transition:background 0.1s; }
+.wl-table tbody tr:hover td { background:rgba(124,106,247,0.06); }
+.wl-table td { padding:12px 10px; vertical-align:middle; }
+.wl-ticker { font-family:var(--mono); font-weight:500; color:#f0eeff; font-size:13px; }
+.wl-name { font-size:11px; color:#8884a0; margin-top:2px; }
+.mono { font-family:var(--mono); }
+.bold { font-weight:500; color:#f0eeff; }
+.muted { color:#8884a0; }
+.accent { color:var(--accent); font-family:var(--mono); }
+.small { font-size:12px; }
+.tiny { font-size:11px; }
+.wl-del { background:none; border:1px solid rgba(255,107,107,0.3); color:var(--red); border-radius:4px; padding:3px 8px; cursor:pointer; font-size:11px; transition:all 0.15s; }
+.wl-del:hover { background:rgba(255,107,107,0.1); }
+.wl-footer { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-top:1px solid var(--border); width:100%; }
+.wl-refresh { background:none; border:1px solid var(--border); color:#a09cc0; border-radius:4px; padding:6px 14px; cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:0.06em; transition:all 0.15s; }
+.wl-refresh:hover { border-color:var(--accent); color:var(--accent); }
+
+/* Header des vues */
+.view-header { padding:16px 24px; border-bottom:1px solid var(--border); font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#a09cc0; }
+
+/* Historique */
+.hist-group { border-bottom:1px solid var(--border); }
+.hist-date { font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#6b6880; padding:10px 16px 6px; background:rgba(255,255,255,0.02); }
+.hist-row { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; cursor:pointer; transition:background 0.1s; border-bottom:0.5px solid var(--border); }
+.hist-row:hover { background:rgba(124,106,247,0.06); }
+.hist-left { display:flex; align-items:center; gap:12px; }
+.hist-ticker { font-family:var(--mono); font-weight:500; color:#f0eeff; font-size:13px; }
+.hist-name { font-size:12px; color:#8884a0; }
+.hist-right { display:flex; align-items:center; gap:16px; }
+.hist-price { font-family:var(--mono); font-size:12px; color:#c0bcd8; }
+.hist-time { font-family:var(--mono); font-size:11px; color:#6b6880; }
