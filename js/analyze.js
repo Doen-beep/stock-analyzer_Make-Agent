@@ -1,4 +1,4 @@
-/* analyze.js | v1.6 | 2026-05-24 */
+/* analyze.js | v1.7 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -216,7 +216,7 @@ async function claudeAnalyze() {
             fullText += event.content;
             aiText.innerHTML = renderMarkdown(fullText);
           } else if (event.type === 'tool_call') {
-            aiText.innerHTML += '<div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin:4px 0;">⚙️ Running ' + event.tool + '...</div>';
+            aiText.innerHTML += '<div class="ai-tool-call">⚙️ ' + event.tool + '...</div>';
           } else if (event.type === 'error') {
             throw new Error(event.message);
           } else if (event.type === 'done') {
