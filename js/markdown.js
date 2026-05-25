@@ -1,4 +1,4 @@
-/* markdown.js | v1.3 | 2026-05-24 */
+/* markdown.js | v1.5 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -41,6 +41,12 @@ function renderMarkdown(text) {
       flushTable();
     }
 
+    // Séparateur horizontal
+    if (raw.trim() === '---' || raw.trim() === '***') {
+      html += '<hr style="border:none;border-top:1px solid var(--border);margin:1rem 0;">';
+      continue;
+    }
+
     if (raw.startsWith('## ')) {
       html += '<h2>' + line.slice(3) + '</h2>';
     } else if (raw.startsWith('### ')) {
@@ -75,6 +81,60 @@ function renderMarkdown(text) {
     .replace(/\bAcheter\b/g, '<span class="badge-buy">✅ Buy</span>');
 
   return '<div class="ai-body">' + html + '</div>';
+}
+
+
+function extractScorecard(text) {
+  const banner = document.getElementById('verdictBanner');
+  if (!banner) return;
+
+  // Extraire Intrinsic Value
+  const ivMatch = text.match(/Intrinsic Value.*?\|.*?([€$][\d,.-]+(?:\s*[–-]\s*[€$][\d,.-]+)?)/i);
+  if (ivMatch) {
+    const el = document.getElementById('vIV');
+    if (el) el.textContent = ivMatch[1].trim();
+  }
+
+  // Extraire Entry Target Price
+  const etpMatch = text.match(/Entry Target.*?\|.*?([€$][\d,.-]+(?:\s*[–-]\s*[€$][\d,.-]+)?)/i);
+  if (etpMatch) {
+    const el = document.getElementById('vETP');
+    if (el) el.textContent = etpMatch[1].trim();
+  }
+
+  // Extraire Current Price
+  const cpMatch = text.match(/Current Price.*?\|.*?([€$][\d,.-]+)/i);
+  if (cpMatch) {
+    const el = document.getElementById('vCP');
+    if (el) el.textContent = cpMatch[1].trim();
+  }
+
+  // Extraire scores du scorecard
+  const scoreMap = {
+    'Business': 'sBusiness',
+    'Moat': 'sMoat',
+    'Financials?': 'sFinance',
+    'Management': 'sManagement',
+    'Valuation': 'sValuation',
+    'Overall': 'sOverall',
+  };
+
+  for (const [key, id] of Object.entries(scoreMap)) {
+    const re = new RegExp(key + '.*?\|.*?(\d(?:\.\d)?)\/5', 'i');
+    const m = text.match(re);
+    if (m) {
+      const el = document.getElementById(id);
+      if (el) {
+        const score = parseFloat(m[1]);
+        const stars = '★'.repeat(Math.round(score)) + '☆'.repeat(5 - Math.round(score));
+        el.innerHTML = '<span style="color:#f5c842;">' + stars + '</span> <span style="font-weight:600;">' + m[1] + '/5</span>';
+      }
+    }
+  }
+
+  // Afficher la section scorecard si des données trouvées
+  const sc = document.getElementById('scorecardBanner');
+  if (sc && (ivMatch || etpMatch)) sc.style.display = 'block';
 }
 
 function extractVerdict(text) {
@@ -161,4 +221,9 @@ function extractVerdict(text) {
     decision: document.getElementById('vDecision')?.textContent?.trim() || '—',
     target: target,
   };
+}
+
+// Appeler extractScorecard après chaque mise à jour du texte
+function updateScorecard(text) {
+  extractScorecard(text);
 }
