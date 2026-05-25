@@ -1,4 +1,4 @@
-/* api/openai-analysis.js | v1.4 | 2026-05-25 */
+/* api/openai-analysis.js | v1.5 | 2026-05-25 */
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -103,19 +103,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Content-Type', 'application/json');
 
   const { ticker, marketData } = req.body;
-  if (!ticker) {
-    res.write(`data: ${JSON.stringify({ type: 'error', message: 'ticker required' })}\n\n`);
-    return res.end();
-  }
-
-  const sendEvent = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
-
-  sendEvent({ type: 'start', message: `Starting GPT-4.1 Buffett analysis for ${ticker}...` });
+  if (!ticker) return res.status(400).json({ error: 'ticker required' });
 
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
@@ -139,23 +130,15 @@ export default async function handler(req, res) {
     }
 
     const result = await response.json();
-
-    // Extraire le texte de la réponse
     const output = result.output || [];
     const msgBlock = output.find(o => o.type === 'message');
     const text = msgBlock?.content?.find(c => c.type === 'output_text')?.text || '';
 
-    if (text) {
-      sendEvent({ type: 'text', content: text });
-    } else {
-      throw new Error('Empty response from OpenAI');
-    }
+    if (!text) throw new Error('Empty response from OpenAI');
 
-    sendEvent({ type: 'done', message: 'Analysis complete' });
+    res.status(200).json({ text });
 
   } catch(e) {
-    sendEvent({ type: 'error', message: e.message });
+    res.status(500).json({ error: e.message });
   }
-
-  res.end();
 }
