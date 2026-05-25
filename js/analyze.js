@@ -1,4 +1,4 @@
-/* analyze.js | v2.6 | 2026-05-24 */
+/* analyze.js | v2.7 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -224,50 +224,29 @@ async function gptAnalyze() {
       })),
     };
 
-    // Appel simple — OpenAI /v1/responses ne streame pas vraiment
     const res = await fetch(VERCEL_URL + '/api/openai-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ticker: p.symbol || '',
-        marketData: compactData,
-      }),
+      body: JSON.stringify({ ticker: p.symbol || '', marketData: compactData }),
     });
 
+    if (window._gptStepTimer) { clearInterval(window._gptStepTimer); window._gptStepTimer = null; }
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
-    // Arrêter le timer et afficher les résultats
-    if (window._gptStepTimer) { clearInterval(window._gptStepTimer); window._gptStepTimer = null; }
-
     const json = await res.json();
-    const fullText = json.text || json.content || '';
-
+    if (json.error) throw new Error(json.error);
+    const fullText = json.text || '';
     if (!fullText) throw new Error('Empty response from OpenAI');
 
     aiText.innerHTML = renderMarkdown(fullText);
     if (typeof updateScorecard === 'function') updateScorecard(fullText);
-    extractVerdict(fullText);
     window._lastVerdict = extractVerdict(fullText);
-
     const wlBtn = document.getElementById('wlBtn');
     if (wlBtn) { wlBtn.style.display = 'block'; wlBtn.classList.remove('added'); wlBtn.textContent = '+ Add to Watchlist'; }
 
-    if (false) { // ancien code SSE désactivé
-        try {
-          const event = { type: 'text', content: '' };
-          if (event.type === 'text') {
-          } else if (event.type === 'tool_call') {
-          } else if (event.type === 'error') {
-          } else if (event.type === 'done') {
-          }
-        } catch(e) {
-          if (e.message !== 'Unexpected end of JSON input') console.warn('SSE parse error:', e);
-        }
-      }
-    }
-
   } catch(e) {
-    document.getElementById('aiText').innerHTML = '<span style="color:var(--red)">Claude Error: ' + e.message + '</span>';
+    if (window._gptStepTimer) { clearInterval(window._gptStepTimer); window._gptStepTimer = null; }
+    aiText.innerHTML = '<span style="color:var(--red)">Error: ' + e.message + '</span>';
   } finally {
     if (gptBtn) gptBtn.disabled = false;
   }
