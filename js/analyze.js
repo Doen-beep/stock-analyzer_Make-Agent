@@ -1,4 +1,4 @@
-/* analyze.js | v2.3 | 2026-05-24 */
+/* analyze.js | v2.4 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -139,47 +139,44 @@ async function gptAnalyze() {
   claudeBtn.disabled = true;
   aiBlock.style.display = 'block';
   // Bandeau d'attente animé
-  const steps = [
-    '🔍 Searching for qualitative data — moat, management, competitive advantages...',
-    '📊 Retrieving 10-year financial history — revenue, FCF, margins...',
-    '🧮 Calculating normalized FCF and ROIC over full cycle...',
-    '💡 Running DCF and Owner Earnings valuation models...',
-    '⚖️ Comparing intrinsic value to current price...',
-    '📝 Writing final verdict and scorecard...',
+  // Bandeau d'attente simple
+  const waitSteps = [
+    { icon: '🔍', text: 'Searching for company moat, management quality and competitive advantages...' },
+    { icon: '📊', text: 'Retrieving 10 years of financial history — revenue, FCF, margins, ROIC...' },
+    { icon: '🧮', text: 'Normalizing earnings over a full business cycle...' },
+    { icon: '💡', text: 'Running DCF and Owner Earnings valuation models...' },
+    { icon: '⚖️', text: 'Comparing intrinsic value to current market price...' },
+    { icon: '📝', text: 'Writing final verdict and scorecard...' },
   ];
-  let stepIdx = 0;
-
-  function renderWaitBanner() {
-    return `
-      <div id="waitBanner" style="border:1px solid var(--border);border-radius:6px;padding:20px 24px;margin-bottom:8px;">
-        <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">
-          🚀 GPT-4.1 Deep Analysis Running...
-        </div>
-        <div id="waitStep" style="font-size:14px;color:var(--text);margin-bottom:16px;">${steps[0]}</div>
-        <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
-          <div id="waitBar" style="height:100%;background:var(--accent);border-radius:2px;width:0%;"></div>
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-top:10px;">Searching 10 years of financial data — please wait 30-60 seconds</div>
-      </div>`;
-  }
 
   aiBlock.style.display = 'block';
-  aiText.innerHTML = renderWaitBanner();
+  let waitIdx = 0;
 
-  // Démarrer l'animation après le rendu
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const bar = document.getElementById('waitBar');
-      if (bar) { bar.style.transition = 'width 55s linear'; bar.style.width = '90%'; }
-    });
-  });
+  function renderWait() {
+    return '<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">' +
+      waitSteps.map((s, i) => {
+        const active = i === waitIdx;
+        const done = i < waitIdx;
+        return '<div style="display:flex;align-items:center;gap:12px;padding:12px 18px;' +
+          'border-bottom:' + (i < waitSteps.length-1 ? '0.5px solid var(--border)' : 'none') + ';' +
+          'background:' + (active ? 'rgba(169,144,255,0.08)' : 'none') + ';' +
+          'opacity:' + (done ? '0.4' : active ? '1' : '0.3') + ';">' +
+          '<span style="font-size:16px;">' + (done ? '✓' : s.icon) + '</span>' +
+          '<span style="font-size:13px;color:' + (active ? 'var(--text)' : 'var(--muted)') + ';' +
+          'font-weight:' + (active ? '500' : '400') + ';">' + s.text + '</span>' +
+          (active ? '<span style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--accent);">running...</span>' : '') +
+          '</div>';
+      }).join('') +
+      '<div style="padding:10px 18px;font-family:var(--mono);font-size:11px;color:var(--muted);border-top:0.5px solid var(--border);">This analysis searches 10 years of financial data — please wait 30-60 seconds</div>' +
+      '</div>';
+  }
 
-  const stepTimer = setInterval(() => {
-    stepIdx = (stepIdx + 1) % steps.length;
-    const el = document.getElementById('waitStep');
-    if (el) el.textContent = steps[stepIdx];
+  aiText.innerHTML = renderWait();
+  const waitTimer = setInterval(() => {
+    waitIdx = Math.min(waitIdx + 1, waitSteps.length - 1);
+    aiText.innerHTML = renderWait();
   }, 9000);
-  window._gptStepTimer = stepTimer;
+  window._gptStepTimer = waitTimer;
 
   try {
     // Envoyer données compactes pour respecter la limite de tokens
