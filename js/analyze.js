@@ -1,4 +1,4 @@
-/* analyze.js | v2.5 | 2026-05-24 */
+/* analyze.js | v2.6 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -224,6 +224,7 @@ async function gptAnalyze() {
       })),
     };
 
+    // Appel simple — OpenAI /v1/responses ne streame pas vraiment
     const res = await fetch(VERCEL_URL + '/api/openai-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -235,36 +236,29 @@ async function gptAnalyze() {
 
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
-    // Lire le stream SSE
+    // Arrêter le timer et afficher les résultats
     if (window._gptStepTimer) { clearInterval(window._gptStepTimer); window._gptStepTimer = null; }
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let fullText = '';
-    aiText.innerHTML = '';
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    const json = await res.json();
+    const fullText = json.text || json.content || '';
 
-      const chunk = decoder.decode(value);
-      const lines = chunk.split('\n');
+    if (!fullText) throw new Error('Empty response from OpenAI');
 
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
+    aiText.innerHTML = renderMarkdown(fullText);
+    if (typeof updateScorecard === 'function') updateScorecard(fullText);
+    extractVerdict(fullText);
+    window._lastVerdict = extractVerdict(fullText);
+
+    const wlBtn = document.getElementById('wlBtn');
+    if (wlBtn) { wlBtn.style.display = 'block'; wlBtn.classList.remove('added'); wlBtn.textContent = '+ Add to Watchlist'; }
+
+    if (false) { // ancien code SSE désactivé
         try {
-          const event = JSON.parse(line.slice(6));
+          const event = { type: 'text', content: '' };
           if (event.type === 'text') {
-            fullText += event.content;
-            aiText.innerHTML = renderMarkdown(fullText);
-            if (typeof updateScorecard === 'function') updateScorecard(fullText);
           } else if (event.type === 'tool_call') {
-            aiText.innerHTML += '<div class="ai-tool-call">⚙️ ' + event.tool + '...</div>';
           } else if (event.type === 'error') {
-            throw new Error(event.message);
           } else if (event.type === 'done') {
-            extractVerdict(fullText);
-            const wlBtn = document.getElementById('wlBtn');
-            if (wlBtn) wlBtn.style.display = 'block';
           }
         } catch(e) {
           if (e.message !== 'Unexpected end of JSON input') console.warn('SSE parse error:', e);
