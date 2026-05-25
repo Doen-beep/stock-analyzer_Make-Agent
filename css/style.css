@@ -1,4 +1,4 @@
-/* style.css | v2.3 | 2026-05-24 */
+/* style.css | v2.4 | 2026-05-24 */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -10,7 +10,7 @@
   --green: #2ee8b0;
   --red: #ff6b6b;
   --text: #eeeaff;
-  --muted: #b0aad8;
+  --muted: #c8c4e8;
   --mono: 'DM Mono', monospace;
   --sans: 'DM Sans', sans-serif;
 }
