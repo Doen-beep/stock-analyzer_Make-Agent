@@ -1,4 +1,4 @@
-/* analyze.js | v2.4 | 2026-05-24  */
+/* analyze.js | v2.5 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -132,13 +132,12 @@ async function claudeAnalyze() { return gptAnalyze(); }
 async function gptAnalyze() {
   if (!lastData) return;
 
-  const claudeBtn = document.getElementById('claudeBtn');
+  const gptBtn = document.getElementById('gptBtn');
   const aiBlock = document.getElementById('aiBlock');
   const aiText = document.getElementById('aiText');
 
-  claudeBtn.disabled = true;
-  aiBlock.style.display = 'block';
-  // Bandeau d'attente animé
+  if (!aiBlock || !aiText) { console.error('aiBlock or aiText not found'); return; }
+  if (gptBtn) gptBtn.disabled = true;
   // Bandeau d'attente simple
   const waitSteps = [
     { icon: '🔍', text: 'Searching for company moat, management quality and competitive advantages...' },
@@ -150,6 +149,7 @@ async function gptAnalyze() {
   ];
 
   aiBlock.style.display = 'block';
+  aiText.innerHTML = '';
   let waitIdx = 0;
 
   function renderWait() {
@@ -275,7 +275,7 @@ async function gptAnalyze() {
   } catch(e) {
     document.getElementById('aiText').innerHTML = '<span style="color:var(--red)">Claude Error: ' + e.message + '</span>';
   } finally {
-    claudeBtn.disabled = false;
+    if (gptBtn) gptBtn.disabled = false;
   }
 }
 
