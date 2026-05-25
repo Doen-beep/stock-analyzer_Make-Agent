@@ -1,4 +1,4 @@
-/* analyze.js | v1.8 | 2026-05-24 */
+/* analyze.js | v2.0 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -127,7 +127,9 @@ function addCurrentToWatchlist() {
   setTimeout(() => showWatchlistTab(), 800);
 }
 
-async function claudeAnalyze() {
+async function claudeAnalyze() { return gptAnalyze(); }
+
+async function gptAnalyze() {
   if (!lastData) return;
 
   const claudeBtn = document.getElementById('claudeBtn');
@@ -136,7 +138,36 @@ async function claudeAnalyze() {
 
   claudeBtn.disabled = true;
   aiBlock.style.display = 'block';
-  aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">🚀 GPT-4.1 deep analysis running... (may take 30-60s)</span>';
+  // Bandeau d'attente animé
+  const steps = [
+    '🔍 Searching for qualitative data — moat, management, competitive advantages...',
+    '📊 Retrieving 10-year financial history — revenue, FCF, margins...',
+    '🧮 Calculating normalized FCF and ROIC over full cycle...',
+    '💡 Running DCF and Owner Earnings valuation models...',
+    '⚖️ Comparing intrinsic value to current price...',
+    '📝 Writing final verdict and scorecard...',
+  ];
+  let stepIdx = 0;
+  aiText.innerHTML = `
+    <div id="waitBanner" style="border:1px solid var(--border);border-radius:6px;padding:20px 24px;margin-bottom:8px;">
+      <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">
+        🚀 GPT-4.1 Deep Analysis Running...
+      </div>
+      <div id="waitStep" style="font-size:13px;color:var(--text);margin-bottom:16px;">${steps[0]}</div>
+      <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+        <div id="waitBar" style="height:100%;background:var(--accent);border-radius:2px;width:5%;transition:width 8s linear;"></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">This analysis searches 10 years of financial data — please wait 30-60 seconds</div>
+    </div>
+  `;
+  // Animer la barre et les étapes
+  setTimeout(() => { const b = document.getElementById('waitBar'); if(b) b.style.width = '90%'; }, 100);
+  const stepTimer = setInterval(() => {
+    stepIdx = (stepIdx + 1) % steps.length;
+    const el = document.getElementById('waitStep');
+    if (el) el.textContent = steps[stepIdx];
+  }, 8000);
+  window._gptStepTimer = stepTimer;
 
   try {
     // Envoyer données compactes pour respecter la limite de tokens
@@ -196,6 +227,7 @@ async function claudeAnalyze() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
 
     // Lire le stream SSE
+    if (window._gptStepTimer) { clearInterval(window._gptStepTimer); window._gptStepTimer = null; }
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let fullText = '';
@@ -230,6 +262,75 @@ async function claudeAnalyze() {
       }
     }
 
+  } catch(e) {
+    document.getElementById('aiText').innerHTML = '<span style="color:var(--red)">Claude Error: ' + e.message + '</span>';
+  } finally {
+    claudeBtn.disabled = false;
+  }
+}
+
+async function claudeOnlyAnalyze() {
+  if (!lastData) return;
+
+  const claudeBtn = document.getElementById('claudeBtn');
+  const aiBlock = document.getElementById('aiBlock');
+  const aiText = document.getElementById('aiText');
+
+  claudeBtn.disabled = true;
+  aiBlock.style.display = 'block';
+  aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">🧪 Claude Buffett analysis running...</span>';
+
+  const p = lastData.price || {};
+  const sd = lastData.summaryDetail || {};
+  const fd = lastData.financialData || {};
+  const ks = lastData.defaultKeyStatistics || {};
+  const currency = p.currency || 'USD';
+  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$'}[currency] || currency+' ';
+
+  const compactData = {
+    ticker: p.symbol, name: p.shortName, currency,
+    price: p.regularMarketPrice, marketCap: p.marketCap,
+    peTrailing: sd.trailingPE, peForward: sd.forwardPE,
+    priceToBook: ks.priceToBook, beta: sd.beta,
+    revenue: fd.totalRevenue, revenueGrowth: fd.revenueGrowth,
+    netMargin: fd.profitMargins, freeCashflow: fd.freeCashflow,
+    debtToEquity: fd.debtToEquity, roe: fd.returnOnEquity,
+    eps: ks.trailingEps, epsForward: ks.forwardEps,
+    bookValuePerShare: ks.bookValue, sharesOutstanding: ks.sharesOutstanding,
+    dividendRate: sd.dividendRate, targetMedianPrice: fd.targetMedianPrice,
+    recommendation: fd.recommendationKey,
+  };
+
+  try {
+    const res = await fetch(VERCEL_URL + '/api/buffett-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker: p.symbol || '', marketData: compactData }),
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    if (window._gptStepTimer) { clearInterval(window._gptStepTimer); window._gptStepTimer = null; }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    aiText.innerHTML = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const event = JSON.parse(line.slice(6));
+          if (event.type === 'text') { fullText += event.content; aiText.innerHTML = renderMarkdown(fullText); }
+          else if (event.type === 'tool_call') aiText.innerHTML += '<div class="ai-tool-call">⚙️ ' + event.tool + '...</div>';
+          else if (event.type === 'error') throw new Error(event.message);
+          else if (event.type === 'done') { extractVerdict(fullText); const wlBtn = document.getElementById('wlBtn'); if (wlBtn) wlBtn.style.display = 'block'; }
+        } catch(e) { if (e.message !== 'Unexpected end of JSON input') console.warn('SSE:', e); }
+      }
+    }
   } catch(e) {
     document.getElementById('aiText').innerHTML = '<span style="color:var(--red)">Claude Error: ' + e.message + '</span>';
   } finally {
