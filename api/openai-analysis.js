@@ -1,4 +1,4 @@
-/* api/openai-analysis.js | v1.0 | 2026-05-25 */
+/* api/openai-analysis.js | v1.1 | 2026-05-25 */
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -49,11 +49,21 @@ End with this EXACT summary table:
 | Entry Target Price (×0.70) | $XXX |
 | Current Price | $XXX |
 | Margin of Safety | XX% |
-| Business Quality | Excellent / Good / Average / Poor |
 | Valuation | Undervalued / Fair Value / Overvalued |
 | Decision | BUY / HOLD / PASS |
 | Pessimistic Value (-20%) | $XXX |
 | Optimistic Value (+20%) | $XXX |
+
+Then add a SCORECARD table with ratings out of 5:
+
+| Component | Score | Comment |
+|-----------|-------|---------|
+| Business Quality | X/5 | one line |
+| Moat | X/5 | one line |
+| Financials | X/5 | one line |
+| Management | X/5 | one line |
+| Valuation | X/5 | one line |
+| **Overall** | **X/5** | **one line** |
 
 ## STRICT RULES
 - NEVER mention current price before Phase 4
