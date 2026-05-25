@@ -1,4 +1,4 @@
-/* markdown.js | v1.6 | 2026-05-24 */
+/* markdown.js | v1.7 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -148,15 +148,15 @@ function extractVerdict(text) {
     banner.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid var(--border);';
     banner.innerHTML = `
       <div style="padding:16px 12px;text-align:center;border-right:0.5px solid var(--border);">
-        <div class="vc-label">Qualité</div>
+        <div class="vc-label">Quality</div>
         <div id="vQuality" class="vc-value">—</div>
       </div>
       <div style="padding:16px 12px;text-align:center;border-right:0.5px solid var(--border);">
-        <div class="vc-label">Valorisation</div>
+        <div class="vc-label">Valuation</div>
         <div id="vValuation" class="vc-value">—</div>
       </div>
       <div style="padding:16px 12px;text-align:center;">
-        <div class="vc-label">Décision</div>
+        <div class="vc-label">Decision</div>
         <div id="vDecision" class="vc-value">—</div>
       </div>
       <div id="vTarget" style="display:none;grid-column:1/-1;padding:10px 12px;text-align:center;border-top:0.5px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);"></div>
