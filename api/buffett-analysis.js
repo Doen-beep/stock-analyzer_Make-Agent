@@ -1,4 +1,4 @@
-/* api/buffett-analysis.js | v1.3 | 2026-05-25 */
+/* api/buffett-analysis.js | v1.4 | 2026-05-25 */
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
@@ -191,10 +191,10 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
-          max_tokens: 8000,
+          max_tokens: 4000,
           system: SYSTEM_PROMPT,
           tools: [
-            { type: 'web_search_20250305', name: 'web_search' },
+            { type: 'web_search_20250305', name: 'web_search', max_uses: 3 },
             ...CUSTOM_TOOLS,
           ],
           messages,
