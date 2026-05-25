@@ -1,4 +1,4 @@
-/* analyze.js | v2.2 | 2026-05-24 */
+/* analyze.js | v2.3 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -259,6 +259,7 @@ async function gptAnalyze() {
           if (event.type === 'text') {
             fullText += event.content;
             aiText.innerHTML = renderMarkdown(fullText);
+            if (typeof updateScorecard === 'function') updateScorecard(fullText);
           } else if (event.type === 'tool_call') {
             aiText.innerHTML += '<div class="ai-tool-call">⚙️ ' + event.tool + '...</div>';
           } else if (event.type === 'error') {
