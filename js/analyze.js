@@ -1,4 +1,4 @@
-/* analyze.js | v2.1 | 2026-05-24 */
+/* analyze.js | v2.2 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -148,25 +148,37 @@ async function gptAnalyze() {
     '📝 Writing final verdict and scorecard...',
   ];
   let stepIdx = 0;
-  aiText.innerHTML = `
-    <div id="waitBanner" style="border:1px solid var(--border);border-radius:6px;padding:20px 24px;margin-bottom:8px;">
-      <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">
-        🚀 GPT-4.1 Deep Analysis Running...
-      </div>
-      <div id="waitStep" style="font-size:13px;color:var(--text);margin-bottom:16px;">${steps[0]}</div>
-      <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
-        <div id="waitBar" style="height:100%;background:var(--accent);border-radius:2px;width:5%;transition:width 8s linear;"></div>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:8px;">This analysis searches 10 years of financial data — please wait 30-60 seconds</div>
-    </div>
-  `;
-  // Animer la barre et les étapes
-  setTimeout(() => { const b = document.getElementById('waitBar'); if(b) b.style.width = '90%'; }, 100);
+
+  function renderWaitBanner() {
+    return `
+      <div id="waitBanner" style="border:1px solid var(--border);border-radius:6px;padding:20px 24px;margin-bottom:8px;">
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">
+          🚀 GPT-4.1 Deep Analysis Running...
+        </div>
+        <div id="waitStep" style="font-size:14px;color:var(--text);margin-bottom:16px;">${steps[0]}</div>
+        <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;">
+          <div id="waitBar" style="height:100%;background:var(--accent);border-radius:2px;width:0%;"></div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:10px;">Searching 10 years of financial data — please wait 30-60 seconds</div>
+      </div>`;
+  }
+
+  aiBlock.style.display = 'block';
+  aiText.innerHTML = renderWaitBanner();
+
+  // Démarrer l'animation après le rendu
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const bar = document.getElementById('waitBar');
+      if (bar) { bar.style.transition = 'width 55s linear'; bar.style.width = '90%'; }
+    });
+  });
+
   const stepTimer = setInterval(() => {
     stepIdx = (stepIdx + 1) % steps.length;
     const el = document.getElementById('waitStep');
     if (el) el.textContent = steps[stepIdx];
-  }, 8000);
+  }, 9000);
   window._gptStepTimer = stepTimer;
 
   try {
