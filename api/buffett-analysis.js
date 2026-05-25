@@ -1,4 +1,4 @@
-/* api/buffett-analysis.js | v1.2 | 2026-05-25 */
+/* api/buffett-analysis.js | v1.3 | 2026-05-25 */
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
@@ -235,13 +235,17 @@ export default async function handler(req, res) {
         }
       }
 
-      // Si on a des tool_results custom, les envoyer dans le prochain message
+      // Si Claude a utilisé des outils custom, envoyer tous les results en un seul message
       if (toolResults.length > 0) {
         messages.push({ role: 'user', content: toolResults });
+        continueLoop = true; // Continuer pour que Claude reçoive les résultats
+      } else if (result.stop_reason === 'tool_use') {
+        // Claude veut utiliser des outils mais tous sont natifs (web_search)
+        // Pas besoin d'envoyer tool_results, Anthropic les gère
+        continueLoop = false;
+      } else {
+        continueLoop = false;
       }
-
-      // Continuer si Claude veut utiliser plus d'outils
-      continueLoop = result.stop_reason === 'tool_use';
     }
 
     sendEvent({ type: 'done', message: 'Analysis complete' });
