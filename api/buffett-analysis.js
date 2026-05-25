@@ -1,4 +1,4 @@
-/* api/buffett-analysis.js | v1.4 | 2026-05-25 */
+/* api/buffett-analysis.js | v1.7 | 2026-05-25 */
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
@@ -117,7 +117,7 @@ const SYSTEM_PROMPT = `You are a senior financial analyst specializing in value 
 You receive real-time market data for a publicly traded company. Your analysis MUST follow these 5 phases STRICTLY in order:
 
 ## PHASE 1 — QUALITATIVE ANALYSIS
-Run web searches on: company moat, competitive advantages, management quality, industry trends, recent news.
+Based on your training knowledge, analyze: company moat, competitive advantages, management quality, industry trends, business model quality.
 
 ## PHASE 2 — QUANTITATIVE ANALYSIS
 Analyze the financial data provided. Search for missing historical data (FCF history, CapEx, D&A, equity).
@@ -131,11 +131,19 @@ Only NOW compare intrinsic value to current price.
 Margin of safety = (intrinsic value - current price) / intrinsic value
 
 ## PHASE 5 — FINAL VERDICT
-- Business quality: Excellent / Good / Average / Poor
-- Valuation: Undervalued / Fair Value / Overvalued
-- Decision: BUY (margin ≥ 30%) / HOLD / PASS
-- Entry target = intrinsic value × 0.70
-- Pessimistic (-20%) and optimistic (+20%) scenarios
+End with a summary table in this EXACT format:
+
+| Metric | Value |
+|--------|-------|
+| Intrinsic Value (base) | $XXX |
+| Entry Target Price (×0.70) | $XXX |
+| Current Price | $XXX |
+| Margin of Safety | XX% |
+| Business Quality | Excellent / Good / Average / Poor |
+| Valuation | Undervalued / Fair Value / Overvalued |
+| Decision | BUY / HOLD / PASS |
+| Pessimistic Value (-20%) | $XXX |
+| Optimistic Value (+20%) | $XXX |
 
 ## RULES
 - NEVER mention current price before Phase 4
@@ -187,14 +195,13 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json',
           'x-api-key': ANTHROPIC_API_KEY,
           'anthropic-version': '2023-06-01',
-          'anthropic-beta': 'web-search-2025-03-05',
+
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 4000,
           system: SYSTEM_PROMPT,
           tools: [
-            { type: 'web_search_20250305', name: 'web_search', max_uses: 3 },
             ...CUSTOM_TOOLS,
           ],
           messages,
