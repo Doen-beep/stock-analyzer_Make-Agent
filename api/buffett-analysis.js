@@ -1,4 +1,4 @@
-/* api/buffett-analysis.js | v1.1 | 2026-05-25 */
+/* api/buffett-analysis.js | v1.2 | 2026-05-25 */
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
@@ -190,7 +190,7 @@ export default async function handler(req, res) {
           'anthropic-beta': 'web-search-2025-03-05',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5',
+          model: 'claude-haiku-4-5-20251001',
           max_tokens: 8000,
           system: SYSTEM_PROMPT,
           tools: [
