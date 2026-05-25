@@ -1,4 +1,4 @@
-/* analyze.js | v1.4 | 2026-05-24 */
+/* analyze.js | v1.5 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -139,7 +139,7 @@ async function claudeAnalyze() {
   aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">🧪 Claude Buffett analysis running... (may take 30-60s)</span>';
 
   try {
-    const res = await fetch('/api/buffett-analysis', {
+    const res = await fetch(VERCEL_URL + '/api/buffett-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
