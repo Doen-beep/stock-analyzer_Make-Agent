@@ -1,4 +1,4 @@
-/* api/openai-analysis.js | v1.2 | 2026-05-25 */
+/* api/openai-analysis.js | v1.4 | 2026-05-25 */
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -23,30 +23,35 @@ Search the web for:
 - Whether the company is in a cyclical downturn or structural decline
 
 ## PHASE 2 — QUANTITATIVE ANALYSIS
-MANDATORY: Search the web for historical financial data:
-- Revenue over 5 years (search "[company] annual revenue 2020 2021 2022 2023 2024")
-- FCF over 5 years (search "[company] free cash flow history")
-- EBIT margins over 5 years
-- ROIC over 5 years
-- CapEx history
+⚠️ YOU MUST ACTUALLY PERFORM THE WEB SEARCHES BELOW — DO NOT SKIP THEM.
+Do NOT say "I will search" — actually search NOW using your web_search tool.
 
-If current FCF is negative or distorted, use NORMALIZED FCF based on historical margins.
+Required searches (execute ALL of them):
+1. Search: "[company name] revenue history 2015 2016 2017 2018 2019 2020 2021 2022 2023 2024"
+2. Search: "[company name] free cash flow history annual"
+3. Search: "[company name] EBIT margin history"
+4. Search: "[company name] ROIC return on invested capital history"
+5. Search: "[company name] annual report 2024 financial highlights"
 
-Calculate and present in a table:
-- Revenue CAGR 5Y
-- Normalized FCF Margin (use average of last 3-5 years, not current)
+After searches, build a 10-year financial table with actual numbers found.
+If current FCF is negative or distorted by cycle, use NORMALIZED FCF based on 10-year average margins.
+
+Present results in a table:
+- Revenue CAGR 10Y and 5Y (with actual figures)
+- Normalized FCF Margin (10-year average)
 - Net Debt / EBITDA
-- ROE, ROIC (average over 5 years)
-- Payout ratio
+- ROE, ROIC (10-year average)
 
 ## PHASE 3 — INTRINSIC VALUE
-IMPORTANT: Use NORMALIZED figures, not distorted current figures.
-Calculate using at least 2 methods:
-1. DCF on NORMALIZED Free Cash Flow (justify normalization assumptions)
-2. Owner Earnings method (Buffett: NetIncome + D&A - MaintenanceCapex, normalized)
-3. EV/EBIT or P/FCF multiple if DCF is unreliable
+⚠️ ONLY use figures from your web searches above — NEVER use current distorted figures alone.
+⚠️ If FCF is currently negative due to cycle, normalize based on historical margins.
 
-Show all calculations explicitly. State all assumptions clearly.
+Calculate using 2 methods minimum:
+1. DCF on NORMALIZED FCF (10-year projection, show every assumption and calculation)
+2. Owner Earnings (NetIncome + D&A - MaintenanceCapex, normalized over 10Y)
+3. EV/EBIT multiple if DCF unreliable
+
+Show ALL calculations step by step. No black boxes.
 
 ## PHASE 4 — COMPARISON TO CURRENT PRICE
 Only NOW compare intrinsic value to current price.
