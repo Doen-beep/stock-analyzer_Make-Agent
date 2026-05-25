@@ -1,4 +1,4 @@
-/* analyze.js | v1.3 | 2026-05-24 */
+/* analyze.js | v1.4 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -125,4 +125,69 @@ function addCurrentToWatchlist() {
   }
   updateWlCount();
   setTimeout(() => showWatchlistTab(), 800);
+}
+
+async function claudeAnalyze() {
+  if (!lastData) return;
+
+  const claudeBtn = document.getElementById('claudeBtn');
+  const aiBlock = document.getElementById('aiBlock');
+  const aiText = document.getElementById('aiText');
+
+  claudeBtn.disabled = true;
+  aiBlock.style.display = 'block';
+  aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">🧪 Claude Buffett analysis running... (may take 30-60s)</span>';
+
+  try {
+    const res = await fetch('/api/buffett-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ticker: lastData.price?.symbol || '',
+        marketData: lastData,
+      }),
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    // Lire le stream SSE
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    aiText.innerHTML = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const event = JSON.parse(line.slice(6));
+          if (event.type === 'text') {
+            fullText += event.content;
+            aiText.innerHTML = renderMarkdown(fullText);
+          } else if (event.type === 'tool_call') {
+            aiText.innerHTML += '<div style="font-family:var(--mono);font-size:11px;color:var(--accent);margin:4px 0;">⚙️ Running ' + event.tool + '...</div>';
+          } else if (event.type === 'error') {
+            throw new Error(event.message);
+          } else if (event.type === 'done') {
+            extractVerdict(fullText);
+            const wlBtn = document.getElementById('wlBtn');
+            if (wlBtn) wlBtn.style.display = 'block';
+          }
+        } catch(e) {
+          if (e.message !== 'Unexpected end of JSON input') console.warn('SSE parse error:', e);
+        }
+      }
+    }
+
+  } catch(e) {
+    document.getElementById('aiText').innerHTML = '<span style="color:var(--red)">Claude Error: ' + e.message + '</span>';
+  } finally {
+    claudeBtn.disabled = false;
+  }
 }
