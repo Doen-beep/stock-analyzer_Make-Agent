@@ -1,4 +1,4 @@
-/* render.js | v1.4 | 2026-05-24 */
+/* render.js | v1.5 | 2026-05-24 */
 
 // Tooltip helper
 function tip(text) {
@@ -81,6 +81,7 @@ function render(d) {
 
     <div class="ai-btn-wrap" id="aiBtnWrap">
       <button class="ai-btn" id="aiBtn" onclick="aiAnalyze()">Analyze with AI Agent</button>
+      <button class="ai-btn" id="claudeBtn" onclick="claudeAnalyze()" style="border-color:#e8a87c;color:#e8a87c;margin-top:8px;">🧪 Analyze with Claude (Beta)</button>
       <button class="wl-btn" id="wlBtn" onclick="addCurrentToWatchlist()" style="display:none;">+ Add to Watchlist</button>
     </div>
     <div class="ai-block" id="aiBlock">
