@@ -1,4 +1,4 @@
-/* analyze.js | v1.5 | 2026-05-24 */
+/* analyze.js | v1.6 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -139,12 +139,57 @@ async function claudeAnalyze() {
   aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">🧪 Claude Buffett analysis running... (may take 30-60s)</span>';
 
   try {
+    // Envoyer données compactes pour respecter la limite de tokens
+    const p  = lastData.price || {};
+    const sd = lastData.summaryDetail || {};
+    const fd = lastData.financialData || {};
+    const ks = lastData.defaultKeyStatistics || {};
+    const currency = p.currency || 'USD';
+    const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$'}[currency] || currency+' ';
+
+    const compactData = {
+      ticker: p.symbol,
+      name: p.shortName,
+      currency,
+      price: p.regularMarketPrice,
+      marketCap: p.marketCap,
+      peTrailing: sd.trailingPE,
+      peForward: sd.forwardPE,
+      priceToBook: ks.priceToBook,
+      beta: sd.beta,
+      week52High: sd.fiftyTwoWeekHigh,
+      week52Low: sd.fiftyTwoWeekLow,
+      revenue: fd.totalRevenue,
+      revenueGrowth: fd.revenueGrowth,
+      netMargin: fd.profitMargins,
+      grossMargin: fd.grossMargins,
+      operatingMargin: fd.operatingMargins,
+      freeCashflow: fd.freeCashflow,
+      debtToEquity: fd.debtToEquity,
+      roe: fd.returnOnEquity,
+      roa: fd.returnOnAssets,
+      eps: ks.trailingEps,
+      epsForward: ks.forwardEps,
+      bookValuePerShare: ks.bookValue,
+      sharesOutstanding: ks.sharesOutstanding,
+      dividendRate: sd.dividendRate,
+      dividendYield: sd.dividendYield,
+      targetMedianPrice: fd.targetMedianPrice,
+      targetLowPrice: fd.targetLowPrice,
+      targetHighPrice: fd.targetHighPrice,
+      analystCount: fd.numberOfAnalystOpinions,
+      recommendation: fd.recommendationKey,
+      earningsHistory: (lastData.earnings?.financialsChart?.yearly || []).map(y => ({
+        year: y.date, revenue: y.revenue, earnings: y.earnings
+      })),
+    };
+
     const res = await fetch(VERCEL_URL + '/api/buffett-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ticker: lastData.price?.symbol || '',
-        marketData: lastData,
+        ticker: p.symbol || '',
+        marketData: compactData,
       }),
     });
 
