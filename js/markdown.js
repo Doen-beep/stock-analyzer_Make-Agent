@@ -1,4 +1,4 @@
-/* markdown.js | v1.8 | 2026-05-24 */
+/* markdown.js | v1.9 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -147,11 +147,7 @@ function extractVerdict(text) {
     banner.id = 'verdictBanner';
     banner.style.cssText = 'border-top:0.5px solid var(--border);';
     banner.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid var(--border);">
-        <div style="padding:14px 16px;text-align:center;border-right:0.5px solid var(--border);">
-          <div class="vc-label">Quality</div>
-          <div id="vQuality" class="vc-value">—</div>
-        </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:0.5px solid var(--border);">
         <div style="padding:14px 16px;text-align:center;border-right:0.5px solid var(--border);">
           <div class="vc-label">Valuation</div>
           <div id="vValuation" class="vc-value">—</div>
@@ -192,30 +188,12 @@ function extractVerdict(text) {
           <div class="vc-label">Valuation</div><div id="sValuation" class="vc-value" style="font-size:11px;">—</div>
         </div>
       </div>
-      <div id="vTarget" style="display:none;padding:10px 16px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted);"></div>
+
     `;
     cardHeader.insertAdjacentElement('afterend', banner);
   }
 
-  // Quality
-  const qualities = [
-    ['Excellent', 'badge-buy', '⭐ Excellent'],
-    ['Good', 'badge-buy', '👍 Good'],
-    ['Bon', 'badge-buy', '👍 Good'],
-    ['Average', 'badge-wait', '⚠️ Average'],
-    ['Moyen', 'badge-wait', '⚠️ Average'],
-    ['Poor', 'badge-avoid', '❌ Poor'],
-    ['Mauvais', 'badge-avoid', '❌ Poor'],
-  ];
-  const qEl = document.getElementById('vQuality');
-  if (qEl) {
-    for (const [k, cls, label] of qualities) {
-      if (text.includes(k)) {
-        qEl.innerHTML = '<span class="' + cls + '">' + label + '</span>';
-        break;
-      }
-    }
-  }
+
 
   // Valuation
   const valEl = document.getElementById('vValuation');
@@ -260,17 +238,11 @@ function extractVerdict(text) {
     }
   }
 
-  // Entry target dans vTarget (ancien système)
   const target = etpMatch ? etpMatch[1].trim() : '—';
-  const vt = document.getElementById('vTarget');
-  if (vt && etpMatch) {
-    vt.innerHTML = 'Entry target price: <span style="color:var(--accent);font-weight:500;">' + target + '</span>';
-    vt.style.display = 'block';
-  }
 
   // Scorecard /5
   const scoreMap = [
-    ['Business', 'sBusiness'],
+    ['Business Quality', 'sBusiness'],
     ['Moat', 'sMoat'],
     ['Financials', 'sFinance'],
     ['Management', 'sManagement'],
@@ -293,7 +265,7 @@ function extractVerdict(text) {
   banner.style.display = 'block';
 
   return {
-    quality: document.getElementById('vQuality')?.textContent?.trim() || '—',
+    quality: '—',
     valuation: document.getElementById('vValuation')?.textContent?.trim() || '—',
     decision: document.getElementById('vDecision')?.textContent?.trim() || '—',
     target: target,
