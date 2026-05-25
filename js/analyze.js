@@ -1,4 +1,4 @@
-/* analyze.js | v2.8 | 2026-05-24 */
+/* analyze.js | v2.9 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -20,10 +20,8 @@ async function analyze() {
   try {
     const res = await fetch(WEBHOOK + '?symbol=' + encodeURIComponent(ticker) + '&region=' + getRegion(ticker));
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    if (text.trim() === 'Accepted') throw new Error('Make webhook not ready — please retry');
-    let json;
-    try { json = JSON.parse(text); } catch(e) { throw new Error('Invalid response: ' + text.slice(0, 50)); }
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
     const data = json.data || json;
     if (!data.price) throw new Error('Invalid data received');
 
