@@ -1,4 +1,4 @@
-/* analyze.js | v1.7 | 2026-05-24 */
+/* analyze.js | v1.8 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -136,7 +136,7 @@ async function claudeAnalyze() {
 
   claudeBtn.disabled = true;
   aiBlock.style.display = 'block';
-  aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">🧪 Claude Buffett analysis running... (may take 30-60s)</span>';
+  aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">🚀 GPT-4.1 deep analysis running... (may take 30-60s)</span>';
 
   try {
     // Envoyer données compactes pour respecter la limite de tokens
@@ -184,7 +184,7 @@ async function claudeAnalyze() {
       })),
     };
 
-    const res = await fetch(VERCEL_URL + '/api/buffett-analysis', {
+    const res = await fetch(VERCEL_URL + '/api/openai-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
