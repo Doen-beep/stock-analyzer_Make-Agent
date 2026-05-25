@@ -1,4 +1,4 @@
-/* history.js | v2.5 | 2026-05-24 */
+/* history.js | v2.6 | 2026-05-24 */
 
 const SUPABASE_URL = 'https://qxqnxobfsdeqhfanphdo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_KwmWQJ7mAXWRPX03aW2Bvw_aDhwo6O6';
@@ -104,7 +104,7 @@ async function renderHistory() {
         const duration = mins > 0 ? mins + ' min ' + secs + 's' : (s.duration_seconds || 0) + 's';
         const isShort = (s.duration_seconds || 0) < 3;
         const orgLabel = s.org ? '<span style="font-size:10px;color:var(--muted);margin-left:8px;font-family:var(--mono);">' + s.org.substring(0,40) + '</span>' : '';
-        const botLabel = isShort ? '<span style="font-size:12px;font-weight:700;color:#fff;background:var(--red);padding:2px 8px;border-radius:4px;margin-left:8px;">🤖 Bot</span>' : '';
+        const botLabel = isShort ? '<span style="font-size:13px;font-weight:800;color:#ffffff;background:#ff2d2d;padding:3px 10px;border-radius:4px;margin-left:10px;letter-spacing:0.06em;border:1px solid #ff6b6b;text-shadow:0 0 8px #ff2d2d;">🤖 BOT</span>' : '';
         html += '<div class="hist-row" style="opacity:' + (isShort ? '0.5' : '1') + '">';
         html += '<div class="hist-left">' + flag + '<span class="hist-ticker">' + (s.city || '—') + '</span><span class="hist-name">' + (s.country || '—') + '</span>' + orgLabel + botLabel + '</div>';
         html += '<div class="hist-right"><span class="hist-price">' + duration + '</span><span class="hist-time">' + (s.time || '—') + '</span></div>';
