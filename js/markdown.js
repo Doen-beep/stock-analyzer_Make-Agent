@@ -1,4 +1,4 @@
-/* markdown.js | v1.7 | 2026-05-24 */
+/* markdown.js | v1.8 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -138,85 +138,160 @@ function extractScorecard(text) {
 }
 
 function extractVerdict(text) {
-  // Créer ou récupérer le bandeau
+  // Créer ou récupérer le bandeau unique
   let banner = document.getElementById('verdictBanner');
   if (!banner) {
     const cardHeader = document.querySelector('.card-header');
     if (!cardHeader) return;
     banner = document.createElement('div');
     banner.id = 'verdictBanner';
-    banner.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;border-top:0.5px solid var(--border);';
+    banner.style.cssText = 'border-top:0.5px solid var(--border);';
     banner.innerHTML = `
-      <div style="padding:16px 12px;text-align:center;border-right:0.5px solid var(--border);">
-        <div class="vc-label">Quality</div>
-        <div id="vQuality" class="vc-value">—</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid var(--border);">
+        <div style="padding:14px 16px;text-align:center;border-right:0.5px solid var(--border);">
+          <div class="vc-label">Quality</div>
+          <div id="vQuality" class="vc-value">—</div>
+        </div>
+        <div style="padding:14px 16px;text-align:center;border-right:0.5px solid var(--border);">
+          <div class="vc-label">Valuation</div>
+          <div id="vValuation" class="vc-value">—</div>
+        </div>
+        <div style="padding:14px 16px;text-align:center;">
+          <div class="vc-label">Decision</div>
+          <div id="vDecision" class="vc-value">—</div>
+        </div>
       </div>
-      <div style="padding:16px 12px;text-align:center;border-right:0.5px solid var(--border);">
-        <div class="vc-label">Valuation</div>
-        <div id="vValuation" class="vc-value">—</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid var(--border);">
+        <div style="padding:14px 16px;text-align:center;border-right:0.5px solid var(--border);">
+          <div class="vc-label">Intrinsic Value</div>
+          <div id="vIV" class="vc-value" style="font-size:15px;">—</div>
+        </div>
+        <div style="padding:14px 16px;text-align:center;border-right:0.5px solid var(--border);">
+          <div class="vc-label">Entry Target (×0.70)</div>
+          <div id="vETP" class="vc-value" style="font-size:15px;color:var(--green);">—</div>
+        </div>
+        <div style="padding:14px 16px;text-align:center;">
+          <div class="vc-label">Margin of Safety</div>
+          <div id="vMOS" class="vc-value" style="font-size:15px;">—</div>
+        </div>
       </div>
-      <div style="padding:16px 12px;text-align:center;">
-        <div class="vc-label">Decision</div>
-        <div id="vDecision" class="vc-value">—</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:0.5px solid var(--border);">
+        <div style="padding:10px 8px;text-align:center;border-right:0.5px solid var(--border);">
+          <div class="vc-label">Business</div><div id="sBusiness" class="vc-value" style="font-size:11px;">—</div>
+        </div>
+        <div style="padding:10px 8px;text-align:center;border-right:0.5px solid var(--border);">
+          <div class="vc-label">Moat</div><div id="sMoat" class="vc-value" style="font-size:11px;">—</div>
+        </div>
+        <div style="padding:10px 8px;text-align:center;border-right:0.5px solid var(--border);">
+          <div class="vc-label">Financials</div><div id="sFinance" class="vc-value" style="font-size:11px;">—</div>
+        </div>
+        <div style="padding:10px 8px;text-align:center;border-right:0.5px solid var(--border);">
+          <div class="vc-label">Management</div><div id="sManagement" class="vc-value" style="font-size:11px;">—</div>
+        </div>
+        <div style="padding:10px 8px;text-align:center;">
+          <div class="vc-label">Valuation</div><div id="sValuation" class="vc-value" style="font-size:11px;">—</div>
+        </div>
       </div>
-      <div id="vTarget" style="display:none;grid-column:1/-1;padding:10px 12px;text-align:center;border-top:0.5px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);"></div>
+      <div id="vTarget" style="display:none;padding:10px 16px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted);"></div>
     `;
     cardHeader.insertAdjacentElement('afterend', banner);
   }
 
-  // Qualité
+  // Quality
   const qualities = [
     ['Excellent', 'badge-buy', '⭐ Excellent'],
+    ['Good', 'badge-buy', '👍 Good'],
     ['Bon', 'badge-buy', '👍 Good'],
+    ['Average', 'badge-wait', '⚠️ Average'],
     ['Moyen', 'badge-wait', '⚠️ Average'],
-    ['Mauvais', 'badge-avoid', '❌ Poor']
+    ['Poor', 'badge-avoid', '❌ Poor'],
+    ['Mauvais', 'badge-avoid', '❌ Poor'],
   ];
-  for (const [k, cls, label] of qualities) {
-    if (text.includes(k)) {
-      document.getElementById('vQuality').innerHTML = `<span class="${cls}">${label}</span>`;
-      break;
+  const qEl = document.getElementById('vQuality');
+  if (qEl) {
+    for (const [k, cls, label] of qualities) {
+      if (text.includes(k)) {
+        qEl.innerHTML = '<span class="' + cls + '">' + label + '</span>';
+        break;
+      }
     }
   }
 
-  // Valorisation
-  if (text.includes('Sous-évalué')) {
-    document.getElementById('vValuation').innerHTML = '<span class="badge-buy">📈 Undervalued</span>';
-  } else if (text.includes('Juste prix')) {
-    document.getElementById('vValuation').innerHTML = '<span class="badge-wait">⚖️ Fair Value</span>';
-  } else if (text.includes('Surévalué')) {
-    document.getElementById('vValuation').innerHTML = '<span class="badge-avoid">📉 Overvalued</span>';
-  }
-
-  // Décision
-  if (text.includes('Éviter')) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-avoid">✗ Avoid</span>';
-  } else if (text.includes('Attendre')) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-wait">⏳ Wait</span>';
-  } else if (text.includes('Acheter')) {
-    document.getElementById('vDecision').innerHTML = '<span class="badge-buy">✅ Buy</span>';
-  }
-
-  // Prix cible
-  let target = '—';
-  const patterns = [
-    /Entry Target.*?\|.*?([$€][\d.,]+)/i,
-    /Entry Target Price.*?([$€][\d.,]+)/i,
-    /prix\s+(?:cible|d.entr[eé]e)[^$\d€]*([$€]?\s*[\d.,]+)/i,
-    /entr[eé]e\s*(?:à|:)\s*([$€]?\s*[\d.,]+)/i,
-    /cible\s*(?:à|:)\s*([$€]?\s*[\d.,]+)/i,
-  ];
-  for (const p of patterns) {
-    const m = text.match(p);
-    if (m && m[1].trim().length > 1) {
-      target = m[1].trim();
-      const vt = document.getElementById('vTarget');
-      vt.innerHTML = `Entry target price: <span style="color:var(--accent);font-weight:500;">${target}</span>`;
-      vt.style.display = 'block';
-      break;
+  // Valuation
+  const valEl = document.getElementById('vValuation');
+  if (valEl) {
+    if (/Undervalued/i.test(text) || /Sous-évalué/i.test(text)) {
+      valEl.innerHTML = '<span class="badge-buy">📈 Undervalued</span>';
+    } else if (/Fair Value/i.test(text) || /Juste prix/i.test(text)) {
+      valEl.innerHTML = '<span class="badge-wait">⚖️ Fair Value</span>';
+    } else if (/Overvalued/i.test(text) || /Surévalué/i.test(text)) {
+      valEl.innerHTML = '<span class="badge-avoid">📉 Overvalued</span>';
     }
   }
 
-  // Retourner le verdict pour la watchlist
+  // Decision
+  const decEl = document.getElementById('vDecision');
+  if (decEl) {
+    if (/\bPASS\b/.test(text) || /Éviter/i.test(text)) {
+      decEl.innerHTML = '<span class="badge-avoid">✗ Pass</span>';
+    } else if (/\bHOLD\b/.test(text) || /Attendre/i.test(text)) {
+      decEl.innerHTML = '<span class="badge-wait">⏳ Hold</span>';
+    } else if (/\bBUY\b/.test(text) || /Acheter/i.test(text)) {
+      decEl.innerHTML = '<span class="badge-buy">✅ Buy</span>';
+    }
+  }
+
+  // Intrinsic Value
+  const ivMatch = text.match(/Intrinsic Value.*?\|.*?([€$][\d,.-]+(?:\s*[-–]\s*[€$][\d,.-]+)?)/i);
+  if (ivMatch) { const el = document.getElementById('vIV'); if (el) el.textContent = ivMatch[1].trim(); }
+
+  // Entry Target
+  const etpMatch = text.match(/Entry Target.*?\|.*?([€$][\d,.-]+)/i);
+  if (etpMatch) { const el = document.getElementById('vETP'); if (el) el.textContent = etpMatch[1].trim(); }
+
+  // Margin of Safety
+  const mosMatch = text.match(/Margin of Safety.*?\|.*?(-?[\d.]+%)/i);
+  if (mosMatch) {
+    const el = document.getElementById('vMOS');
+    if (el) {
+      const val = parseFloat(mosMatch[1]);
+      el.textContent = mosMatch[1].trim();
+      el.style.color = val >= 30 ? 'var(--green)' : val >= 0 ? 'var(--muted)' : 'var(--red)';
+    }
+  }
+
+  // Entry target dans vTarget (ancien système)
+  const target = etpMatch ? etpMatch[1].trim() : '—';
+  const vt = document.getElementById('vTarget');
+  if (vt && etpMatch) {
+    vt.innerHTML = 'Entry target price: <span style="color:var(--accent);font-weight:500;">' + target + '</span>';
+    vt.style.display = 'block';
+  }
+
+  // Scorecard /5
+  const scoreMap = [
+    ['Business', 'sBusiness'],
+    ['Moat', 'sMoat'],
+    ['Financials', 'sFinance'],
+    ['Management', 'sManagement'],
+    ['Valuation', 'sValuation'],
+  ];
+  for (const [key, id] of scoreMap) {
+    const re = new RegExp(key + '\\s*\\|\\s*(\\d(?:\\.\\d)?)\\/5', 'i');
+    const m = text.match(re);
+    if (m) {
+      const el = document.getElementById(id);
+      if (el) {
+        const score = parseFloat(m[1]);
+        const full = Math.round(score);
+        const stars = '★'.repeat(full) + '☆'.repeat(5 - full);
+        el.innerHTML = '<span style="color:#f5c842;font-size:13px;">' + stars + '</span><br><span style="font-size:11px;">' + m[1] + '/5</span>';
+      }
+    }
+  }
+
+  banner.style.display = 'block';
+
   return {
     quality: document.getElementById('vQuality')?.textContent?.trim() || '—',
     valuation: document.getElementById('vValuation')?.textContent?.trim() || '—',
@@ -225,7 +300,8 @@ function extractVerdict(text) {
   };
 }
 
-// Appeler extractScorecard après chaque mise à jour du texte
 function updateScorecard(text) {
-  extractScorecard(text);
+  if (document.getElementById('verdictBanner')) extractVerdict(text);
 }
+
+// Appeler extractScorecard après chaque mise à jour du texte
