@@ -1,4 +1,4 @@
-/* markdown.js | v1.5 | 2026-05-24 */
+/* markdown.js | v1.6 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -199,7 +199,9 @@ function extractVerdict(text) {
   // Prix cible
   let target = '—';
   const patterns = [
-    /prix\s+(?:cible|d.entr[eé]e)[^$\d]*([$€]?\s*[\d.,]+)/i,
+    /Entry Target.*?\|.*?([$€][\d.,]+)/i,
+    /Entry Target Price.*?([$€][\d.,]+)/i,
+    /prix\s+(?:cible|d.entr[eé]e)[^$\d€]*([$€]?\s*[\d.,]+)/i,
     /entr[eé]e\s*(?:à|:)\s*([$€]?\s*[\d.,]+)/i,
     /cible\s*(?:à|:)\s*([$€]?\s*[\d.,]+)/i,
   ];
