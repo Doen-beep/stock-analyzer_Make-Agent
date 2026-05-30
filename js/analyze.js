@@ -1,4 +1,4 @@
-/* analyze.js | v3.2 | 2026-05-24 */
+/* analyze.js | v3.3 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -29,7 +29,7 @@ async function analyze() {
     // Enregistrer dans l'historique
     const p = data.price || {};
     const currency = p.currency || 'USD';
-    const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','KRW':'₩','SGD':'S$','INR':'₹','SAR':'SAR ','QAR':'QAR '}[currency] || currency+' ';
+    const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','KRW':'₩','SGD':'S$','INR':'₹','SAR':'SAR ','QAR':'QAR ','AED':'AED ','KWD':'KWD '}[currency] || currency+' ';
     addToHistory(p.symbol || ticker, p.shortName || ticker, p.regularMarketPrice, cs);
     status.className = 'status';
     status.textContent = '✓ ' + ticker + ' · ' + new Date().toLocaleTimeString('fr-FR');
@@ -186,7 +186,7 @@ async function gptAnalyze() {
     const fd = lastData.financialData || {};
     const ks = lastData.defaultKeyStatistics || {};
     const currency = p.currency || 'USD';
-    const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','SAR':'SAR ','QAR':'QAR '}[currency] || currency+' ';
+    const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','SAR':'SAR ','QAR':'QAR ','AED':'AED ','KWD':'KWD '}[currency] || currency+' ';
 
     const compactData = {
       ticker: p.symbol,
@@ -278,7 +278,7 @@ async function claudeOnlyAnalyze() {
   const fd = lastData.financialData || {};
   const ks = lastData.defaultKeyStatistics || {};
   const currency = p.currency || 'USD';
-  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','SAR':'SAR ','QAR':'QAR '}[currency] || currency+' ';
+  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','SAR':'SAR ','QAR':'QAR ','AED':'AED ','KWD':'KWD '}[currency] || currency+' ';
 
   const compactData = {
     ticker: p.symbol, name: p.shortName, currency,
