@@ -1,4 +1,4 @@
-/* analyze.js | v3.0 | 2026-05-24 */
+/* analyze.js | v3.1 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -241,9 +241,11 @@ async function gptAnalyze() {
 
     let rendered = renderMarkdown(fullText);
     if (json.incomplete) {
+      const msg = json.reason === 'missing_verdict_table'
+        ? '⚠️ GPT a abrégé cette analyse et n\'a pas produit le tableau de verdict final. Relance l\'analyse pour obtenir la version complète.'
+        : '⚠️ This analysis was cut off before finishing (output length limit). The verdict below may be incomplete — try again for the full report.';
       rendered = '<div style="border:1px solid var(--red);border-radius:8px;padding:10px 14px;' +
-        'margin-bottom:12px;font-size:13px;color:var(--red);">⚠️ This analysis was cut off before ' +
-        'finishing (output length limit). The verdict below may be incomplete — try again for the full report.</div>' +
+        'margin-bottom:12px;font-size:13px;color:var(--red);">' + msg + '</div>' +
         rendered;
     }
     aiText.innerHTML = rendered;
