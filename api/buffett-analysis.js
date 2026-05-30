@@ -1,4 +1,6 @@
-/* api/buffett-analysis.js | v1.7 | 2026-05-25 */
+/* api/buffett-analysis.js | v1.8 | 2026-05-25 */
+
+export const config = { maxDuration: 60 };
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
