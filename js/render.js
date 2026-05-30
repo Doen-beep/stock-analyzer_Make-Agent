@@ -1,4 +1,4 @@
-/* render.js | v1.8 | 2026-05-24 */
+/* render.js | v1.9 | 2026-05-24 */
 
 // Tooltip helper
 function tip(text) {
@@ -16,7 +16,7 @@ function render(d) {
   const price = p.regularMarketPrice;
   const chg   = p.regularMarketChange;
   const currency = p.currency || sd.currency || 'USD';
-  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','HKD':'HK$','AUD':'A$'}[currency] || currency+' ';
+  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','HKD':'HK$','AUD':'A$','SAR':'SAR ','QAR':'QAR '}[currency] || currency+' ';
 
   document.getElementById('card').innerHTML = `
     <div class="card-header">
