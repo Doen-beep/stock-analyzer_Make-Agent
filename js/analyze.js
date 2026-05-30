@@ -1,4 +1,4 @@
-/* analyze.js | v3.3 | 2026-05-24 */
+/* analyze.js | v3.5 | 2026-05-30 */
 let lastData = null;
 
 async function analyze() {
@@ -10,6 +10,12 @@ async function analyze() {
   const errorEl = document.getElementById('error');
   const card    = document.getElementById('card');
 
+  // Jeton de requête : seule la dernière analyse lancée a le droit d'écrire
+  // à l'écran. Évite qu'une requête plus ancienne (encore en vol) écrase
+  // le résultat d'une requête plus récente (course async → double affichage).
+  const myToken = (window._analyzeToken = (window._analyzeToken || 0) + 1);
+  const isStale = () => myToken !== window._analyzeToken;
+
   btn.disabled = true;
   card.style.display = 'none';
   errorEl.style.display = 'none';
@@ -19,8 +25,10 @@ async function analyze() {
 
   try {
     const res = await fetch(WEBHOOK + '?symbol=' + encodeURIComponent(ticker) + '&region=' + getRegion(ticker));
+    if (isStale()) return; // une analyse plus récente a pris le relais
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
+    if (isStale()) return;
     if (json.error) throw new Error(json.error);
     const data = json.data || json;
     if (!data.price) throw new Error('Invalid data received');
@@ -35,12 +43,13 @@ async function analyze() {
     status.textContent = '✓ ' + ticker + ' · ' + new Date().toLocaleTimeString('fr-FR');
     render(data);
   } catch (e) {
+    if (isStale()) return; // ne pas afficher l'erreur d'une analyse périmée
     status.className = 'status';
     status.textContent = '';
     errorEl.textContent = 'Error: ' + e.message;
     errorEl.style.display = 'block';
   } finally {
-    btn.disabled = false;
+    if (!isStale()) btn.disabled = false;
   }
 }
 
@@ -328,5 +337,80 @@ async function claudeOnlyAnalyze() {
     document.getElementById('aiText').innerHTML = '<span style="color:var(--red)">Claude Error: ' + e.message + '</span>';
   } finally {
     claudeBtn.disabled = false;
+  }
+}
+
+// Analyse de crise : décote injustifiée vs vrai déclin, guidée par un contexte
+// de crise saisi par l'utilisateur.
+async function crisisAnalyze() {
+  if (!lastData) return;
+
+  const crisisBtn = document.getElementById('crisisBtn');
+  const ctxInput  = document.getElementById('crisisContext');
+  const aiBlock   = document.getElementById('aiBlock');
+  const aiText    = document.getElementById('aiText');
+
+  const crisisContext = (ctxInput?.value || '').trim();
+  if (!crisisContext) {
+    if (ctxInput) { ctxInput.focus(); ctxInput.style.borderColor = 'var(--red)'; }
+    return;
+  }
+  if (ctxInput) ctxInput.style.borderColor = '';
+
+  crisisBtn.disabled = true;
+  aiBlock.style.display = 'block';
+  aiText.innerHTML = '<span style="color:var(--muted);font-style:italic">🌪️ Analyse de crise en cours (recherche de l\'historique avant le choc)...</span>';
+
+  const p  = lastData.price || {};
+  const sd = lastData.summaryDetail || {};
+  const fd = lastData.financialData || {};
+  const ks = lastData.defaultKeyStatistics || {};
+  const currency = p.currency || 'USD';
+
+  const compactData = {
+    ticker: p.symbol, name: p.shortName, currency,
+    price: p.regularMarketPrice, marketCap: p.marketCap,
+    fiftyTwoWeekHigh: sd.fiftyTwoWeekHigh, fiftyTwoWeekLow: sd.fiftyTwoWeekLow,
+    peTrailing: sd.trailingPE, peForward: sd.forwardPE,
+    priceToBook: ks.priceToBook,
+    revenue: fd.totalRevenue, revenueGrowth: fd.revenueGrowth,
+    netMargin: fd.profitMargins, freeCashflow: fd.freeCashflow,
+    debtToEquity: fd.debtToEquity, roe: fd.returnOnEquity,
+    totalCash: fd.totalCash, totalDebt: fd.totalDebt,
+  };
+
+  try {
+    const res = await fetch(VERCEL_URL + '/api/crisis-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker: p.symbol || '', marketData: compactData, crisisContext }),
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    aiText.innerHTML = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const event = JSON.parse(line.slice(6));
+          if (event.type === 'text') { fullText += event.content; aiText.innerHTML = renderMarkdown(fullText); }
+          else if (event.type === 'tool_call') aiText.innerHTML += '<div class="ai-tool-call">🔎 recherche web...</div>';
+          else if (event.type === 'error') throw new Error(event.message);
+          else if (event.type === 'done') { const wlBtn = document.getElementById('wlBtn'); if (wlBtn) wlBtn.style.display = 'block'; }
+        } catch(e) { if (e.message !== 'Unexpected end of JSON input') console.warn('SSE:', e); }
+      }
+    }
+  } catch(e) {
+    document.getElementById('aiText').innerHTML = '<span style="color:var(--red)">Crisis Error: ' + e.message + '</span>';
+  } finally {
+    crisisBtn.disabled = false;
   }
 }
