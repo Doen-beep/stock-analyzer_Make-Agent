@@ -1,95 +1,256 @@
-/* render.js | v1.9 | 2026-05-24 */
+/* watchlist.js | v2.0 | 2026-05-24 */
+const WATCHLIST_KEY = 'stock_watchlist';
+const CATEGORIES_KEY = 'stock_categories';
 
-// Tooltip helper
-function tip(text) {
-  return `<span class="tip" title="${text}">?</span>`;
+function updateWlCount() {
+  const n = getWatchlist().length;
+  const el = document.getElementById('wlCount');
+  if (el) el.textContent = n ? '(' + n + ')' : '';
 }
 
-function render(d) {
-  const p  = d.price || {};
-  const sd = d.summaryDetail || {};
-  const fd = d.financialData || {};
-  const ks = d.defaultKeyStatistics || {};
+function getWatchlist() {
+  try { return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '[]'); }
+  catch { return []; }
+}
 
-  const sym   = p.symbol || '—';
-  const name  = p.shortName || sym;
-  const price = p.regularMarketPrice;
-  const chg   = p.regularMarketChange;
-  const currency = p.currency || sd.currency || 'USD';
-  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','HKD':'HK$','AUD':'A$','SAR':'SAR ','QAR':'QAR '}[currency] || currency+' ';
+function saveWatchlist(list) {
+  localStorage.setItem(WATCHLIST_KEY, JSON.stringify(list));
+}
 
-  document.getElementById('card').innerHTML = `
-    <div class="card-header">
-      <div class="ticker-name">
-        <h2>${sym}</h2>
-        <p>${name}</p>
-        ${recBadge(fd.recommendationKey)}
-      </div>
-      <div class="price-block">
-        <div class="price">${cs}${fmt(price)}</div>
-        <div class="change ${cc(chg)}">${chg >= 0 ? '+' : ''}${fmt(chg)} (${pct(p.regularMarketChangePercent)})</div>
-        ${p.postMarketPrice ? `<div class="change ${cc(p.postMarketChange)}" style="font-size:11px;margin-top:2px">After-hours ${cs}${fmt(p.postMarketPrice)} ${p.postMarketChange >= 0 ? '+' : ''}${fmt(p.postMarketChange)}</div>` : ''}
-      </div>
+function getCategories() {
+  try { return JSON.parse(localStorage.getItem(CATEGORIES_KEY) || '["All"]'); }
+  catch { return ['All']; }
+}
+
+function saveCategories(cats) {
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(cats));
+}
+
+function addToWatchlist(data, verdict) {
+  const list = getWatchlist();
+  const p = data.price || {};
+  const currency = p.currency || 'USD';
+  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','KRW':'₩','SGD':'S$','INR':'₹','AED':'AED ','SAR':'SAR ','QAR':'QAR '}[currency] || currency+' ';
+  const now = new Date();
+
+  const entry = {
+    ticker: p.symbol || '—',
+    name: p.shortName || p.symbol || '—',
+    currency: cs,
+    priceAdded: p.regularMarketPrice,
+    priceCurrent: p.regularMarketPrice,
+    intrinsicValue: verdict.intrinsicValue || '—',
+    valuation: verdict.valuation || '—',
+    decision: verdict.decision || '—',
+    target: verdict.target || '—',
+    scores: verdict.scores || {},
+    overall: verdict.overall || '—',
+    category: 'All',
+    dateAdded: now.toLocaleDateString('en-GB'),
+    dateAnalyzed: now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}),
+  };
+
+  const idx = list.findIndex(e => e.ticker === entry.ticker);
+  const isUpdate = idx >= 0;
+  if (isUpdate) {
+    entry.priceAdded = list[idx].priceAdded;
+    entry.category = list[idx].category || 'All';
+    list[idx] = entry;
+  } else {
+    list.unshift(entry);
+  }
+
+  saveWatchlist(list);
+  updateWlCount();
+  renderWatchlist();
+  return isUpdate;
+}
+
+function removeFromWatchlist(ticker) {
+  const list = getWatchlist().filter(e => e.ticker !== ticker);
+  saveWatchlist(list);
+  updateWlCount();
+  renderWatchlist();
+}
+
+function setCategory(ticker, category) {
+  const list = getWatchlist();
+  const idx = list.findIndex(e => e.ticker === ticker);
+  if (idx >= 0) { list[idx].category = category; saveWatchlist(list); }
+  renderWatchlist();
+}
+
+function addCategory(name) {
+  if (!name || !name.trim()) return;
+  const cats = getCategories();
+  if (!cats.includes(name.trim())) { cats.push(name.trim()); saveCategories(cats); }
+  renderWatchlist();
+}
+
+function deleteCategory(name) {
+  if (name === 'All') return;
+  const cats = getCategories().filter(c => c !== name);
+  saveCategories(cats);
+  // Reset stocks in this category to 'All'
+  const list = getWatchlist();
+  list.forEach(e => { if (e.category === name) e.category = 'All'; });
+  saveWatchlist(list);
+  renderWatchlist();
+}
+
+let activeCategory = 'All';
+
+function renderWatchlist() {
+  const list = getWatchlist();
+  const cats = getCategories();
+  const container = document.getElementById('watchlistContent');
+  if (!container) return;
+
+  // Filtrer par catégorie active
+  const filtered = activeCategory === 'All' ? list : list.filter(e => e.category === activeCategory);
+
+  container.innerHTML = `
+    <div class="wl-cats">
+      ${cats.map(c => `
+        <div class="wl-cat ${c === activeCategory ? 'wl-cat-active' : ''}" onclick="activeCategory='${c}';renderWatchlist()">
+          ${c}
+          <span class="wl-cat-count">${c === 'All' ? list.length : list.filter(e => e.category === c).length}</span>
+          ${c !== 'All' ? `<span class="wl-cat-del" onclick="event.stopPropagation();deleteCategory('${c}')">✕</span>` : ''}
+        </div>
+      `).join('')}
+      <div class="wl-cat wl-cat-add" onclick="promptAddCategory()">+ New</div>
     </div>
 
-    <div class="grid">
-      <div class="section"><h3>Session</h3>
-        <div class="row"><span class="label">Open ${tip('Opening price at market open today')}</span><span class="val">${cs}${fmt(p.regularMarketOpen)}</span></div>
-        <div class="row"><span class="label">Volume ${tip('Number of shares traded today')}</span><span class="val">${fmtM(p.regularMarketVolume)}</span></div>
-        <div class="row"><span class="label">Avg Vol. 3M ${tip('Average daily volume over the past 3 months')}</span><span class="val">${fmtM(sd.averageVolume)}</span></div>
-        ${rbar(p.regularMarketDayLow, p.regularMarketDayHigh, price)}
-      </div>
+    ${!filtered.length ? `
+      <div style="text-align:center;padding:48px 24px;color:var(--muted);font-size:13px;">
+        No stocks in this category.<br>
+        <span style="font-size:12px;opacity:0.6">Add stocks from the Analyze tab.</span>
+      </div>` : `
+    <div class="wl-table-wrap">
+      <table class="wl-table">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th class="num">Intrinsic Value</th>
+            <th class="num">Entry Target</th>
+            <th class="num">Price Added</th>
+            <th class="num">Current Price</th>
+            <th class="num">Change</th>
+            <th class="ctr">Score</th>
+            <th class="ctr">Valuation</th>
+            <th class="ctr">Decision</th>
+            <th class="ctr">Category</th>
+            <th class="ctr">Analyzed on</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(e => {
+            const varPct = e.priceAdded ? ((e.priceCurrent - e.priceAdded) / e.priceAdded * 100) : 0;
+            const varColor = varPct >= 0 ? 'var(--green)' : 'var(--red)';
+            const varSign = varPct >= 0 ? '+' : '';
+            const decisionClass = e.decision.includes('Buy') || e.decision.includes('Acheter') ? 'badge-buy' :
+                                  e.decision.includes('Wait') || e.decision.includes('Attendre') ? 'badge-wait' : 'badge-avoid';
+            const catOptions = cats.filter(c => c !== 'All').map(c =>
+              `<option value="${c}" ${e.category === c ? 'selected' : ''}>${c}</option>`
+            ).join('');
+            const sc = e.scores || {};
+            const scoreTip = [
+              'Business: ' + (sc.business || '—') + '/5',
+              'Moat: ' + (sc.moat || '—') + '/5',
+              'Financials: ' + (sc.financials || '—') + '/5',
+              'Management: ' + (sc.management || '—') + '/5',
+              'Valuation: ' + (sc.valuationScore || '—') + '/5',
+            ].join(' · ');
+            const ov = e.overall && e.overall !== '—' ? e.overall : null;
+            const ovStars = ov ? '★'.repeat(Math.round(parseFloat(ov))) : '';
+            return `
+            <tr class="wl-row" onclick="loadFromWatchlist('${e.ticker}')">
+              <td>
+                <div class="wl-ticker">${e.ticker}</div>
+                <div class="wl-name">${e.name}</div>
+              </td>
+              <td class="num mono muted">${e.intrinsicValue || '—'}</td>
+              <td class="num mono accent">${e.target}</td>
+              <td class="num mono muted">${e.currency}${Number(e.priceAdded||0).toFixed(2)}</td>
+              <td class="num mono bold" id="wl-price-${e.ticker}">${e.currency}${Number(e.priceCurrent||0).toFixed(2)}</td>
+              <td class="num mono" style="color:${varColor}">${varSign}${varPct.toFixed(2)}%</td>
+              <td class="ctr small" title="${scoreTip}">${ov ? `<span style="color:#f5c842">${ovStars}</span> ${ov}/5` : '—'}</td>
+              <td class="ctr small">${e.valuation}</td>
+              <td class="ctr small ${decisionClass}">${e.decision}</td>
+              <td class="ctr" onclick="event.stopPropagation()">
+                <select class="wl-cat-select" onchange="setCategory('${e.ticker}', this.value)">
+                  <option value="All" ${e.category === 'All' || !e.category ? 'selected' : ''}>—</option>
+                  ${catOptions}
+                </select>
+              </td>
+              <td class="ctr tiny muted">${e.dateAnalyzed || e.dateAdded}</td>
+              <td class="ctr" onclick="event.stopPropagation()">
+                <button class="wl-del" onclick="removeFromWatchlist('${e.ticker}')">✕</button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`}
 
-      <div class="section"><h3>52 Weeks</h3>
-        <div class="row"><span class="label">High ${tip('Highest price reached in the past 52 weeks')}</span><span class="val up">${cs}${fmt(sd.fiftyTwoWeekHigh)}</span></div>
-        <div class="row"><span class="label">Low ${tip('Lowest price reached in the past 52 weeks')}</span><span class="val down">${cs}${fmt(sd.fiftyTwoWeekLow)}</span></div>
-        <div class="row"><span class="label">Perf. ${tip('Price performance over the past 52 weeks')}</span><span class="val ${cc(ks['52WeekChange'])}">${pct(ks['52WeekChange'])}</span></div>
-        ${rbar(sd.fiftyTwoWeekLow, sd.fiftyTwoWeekHigh, price)}
-      </div>
-
-      <div class="section"><h3>Valuation</h3>
-        <div class="row"><span class="label">Mkt Cap ${tip('Total market value of all shares (price × shares outstanding)')}</span><span class="val">${fmtB(p.marketCap)}</span></div>
-        <div class="row"><span class="label">P/E Trailing ${tip('Price divided by earnings per share over the last 12 months. Lower = cheaper.')}</span><span class="val">${fmt(sd.trailingPE)}x</span></div>
-        <div class="row"><span class="label">P/E Forward ${tip('Price divided by expected earnings per share next year. Lower = cheaper.')}</span><span class="val">${fmt(sd.forwardPE)}x</span></div>
-        <div class="row"><span class="label">Price/Book ${tip('Price compared to the company book value. Below 1 may indicate undervaluation.')}</span><span class="val">${fmt(ks.priceToBook)}x</span></div>
-        <div class="row"><span class="label">Beta ${tip('Measures volatility vs the market. Above 1 = more volatile than the market.')}</span><span class="val">${fmt(sd.beta)}</span></div>
-      </div>
-
-      <div class="section"><h3>Analysts (${fd.numberOfAnalystOpinions || '—'})</h3>
-        <div class="row"><span class="label">Consensus ${tip('Average recommendation from professional analysts')}</span><span class="val">${fd.recommendationKey || '—'}</span></div>
-        <div class="row"><span class="label">Target (median) ${tip('Median price target from analysts over the next 12 months')}</span><span class="val">${cs}${fmt(fd.targetMedianPrice)}</span></div>
-        <div class="row"><span class="label">Upside ${tip('Potential gain if the stock reaches the analysts median target')}</span><span class="val ${price && fd.targetMedianPrice && fd.targetMedianPrice > price ? 'up' : 'down'}">${price && fd.targetMedianPrice ? pct((fd.targetMedianPrice - price) / price) : '—'}</span></div>
-        <div class="row"><span class="label">Range ${tip('Low to high price target range from all analysts')}</span><span class="val">${cs}${fmt(fd.targetLowPrice)}–${cs}${fmt(fd.targetHighPrice)}</span></div>
-      </div>
-
-      <div class="section"><h3>Financials</h3>
-        <div class="row"><span class="label">Revenue ${tip('Total sales revenue over the last 12 months')}</span><span class="val">${fmtB(fd.totalRevenue)}</span></div>
-        <div class="row"><span class="label">Revenue Growth ${tip('Year-over-year growth in total revenue')}</span><span class="val ${cc(fd.revenueGrowth)}">${pct(fd.revenueGrowth)}</span></div>
-        <div class="row"><span class="label">Net Margin ${tip('Percentage of revenue kept as profit after all expenses')}</span><span class="val ${cc(fd.profitMargins)}">${pct(fd.profitMargins)}</span></div>
-        <div class="row"><span class="label">Free Cash Flow ${tip('Cash generated after paying for operations and investments. Key for Buffett analysis.')}</span><span class="val">${fmtB(fd.freeCashflow)}</span></div>
-        <div class="row"><span class="label">Debt/Equity ${tip('Ratio of total debt to shareholder equity. High ratio = more financial risk.')}</span><span class="val">${fmt(fd.debtToEquity)}x</span></div>
-      </div>
-
-      <div class="section"><h3>Dividend & Ownership</h3>
-        <div class="row"><span class="label">Dividend ${tip('Annual dividend paid per share to shareholders')}</span><span class="val">${cs}${fmt(sd.dividendRate)}/yr</span></div>
-        <div class="row"><span class="label">Yield ${tip('Dividend as a percentage of the current share price')}</span><span class="val">${pct(sd.dividendYield)}</span></div>
-        <div class="row"><span class="label">EPS Trailing ${tip('Earnings per share over the last 12 months')}</span><span class="val">${cs}${fmt(ks.trailingEps)}</span></div>
-        <div class="row"><span class="label">EPS Forward ${tip('Expected earnings per share over the next 12 months')}</span><span class="val">${cs}${fmt(ks.forwardEps)}</span></div>
-        <div class="row"><span class="label">Institutions ${tip('Percentage of shares held by institutional investors (funds, banks)')}</span><span class="val">${pct(ks.heldPercentInstitutions)}</span></div>
-      </div>
-    </div>
-
-    <div class="ai-btn-wrap" id="aiBtnWrap">
-      <button class="ai-btn" id="gptBtn" onclick="gptAnalyze()">🚀 Deep Analysis with GPT-4.1</button>
-      <button class="ai-btn" id="claudeBtn" onclick="claudeOnlyAnalyze()" style="border-color:#e8a87c;color:#e8a87c;margin-top:8px;">🧪 Analyze with Claude (Beta)</button>
-      <button class="wl-btn" id="wlBtn" onclick="addCurrentToWatchlist()" style="display:none;">+ Add to Watchlist</button>
-    </div>
-    <div class="ai-block" id="aiBlock">
-      <h3>AI ANALYSIS</h3>
-      <div class="ai-text" id="aiText"></div>
+    <div class="wl-footer">
+      <span class="tiny muted">${filtered.length} stock${filtered.length !== 1 ? 's' : ''}</span>
+      <button class="wl-refresh" onclick="refreshWatchlistPrices()">↻ Refresh Prices</button>
     </div>
   `;
-
-  document.getElementById('card').style.display = 'block';
-  document.getElementById('aiBtnWrap').style.display = 'block';
 }
+
+function promptAddCategory() {
+  const name = prompt('New category name:');
+  if (name && name.trim()) addCategory(name.trim());
+}
+
+async function refreshWatchlistPrices() {
+  const list = getWatchlist();
+  if (!list.length) return;
+  const btn = document.querySelector('.wl-refresh');
+  if (btn) { btn.textContent = '↻ Updating…'; btn.disabled = true; }
+
+  for (const entry of list) {
+    try {
+      const res = await fetch(WEBHOOK + '?symbol=' + encodeURIComponent(entry.ticker) + '&region=' + getRegion(entry.ticker));
+      const json = await res.json();
+      const price = (json.data || json)?.price?.regularMarketPrice;
+      if (price) {
+        entry.priceCurrent = price;
+        const el = document.getElementById('wl-price-' + entry.ticker);
+        if (el) el.textContent = entry.currency + price.toFixed(2);
+      }
+    } catch(e) { console.warn('Refresh error:', entry.ticker, e); }
+  }
+
+  saveWatchlist(list);
+  renderWatchlist();
+  if (btn) { btn.textContent = '↻ Refresh Prices'; btn.disabled = false; }
+}
+
+function loadFromWatchlist(ticker) {
+  showAnalyzeTab();
+  document.getElementById('ticker').value = ticker;
+  analyze();
+}
+
+function showWatchlistTab() {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+  document.getElementById('tabWatchlist').classList.add('tab-active');
+  document.getElementById('analyzeView').style.display = 'none';
+  document.getElementById('watchlistView').style.display = 'flex';
+  if (document.getElementById('historyView')) document.getElementById('historyView').style.display = 'none';
+  renderWatchlist();
+}
+
+function showAnalyzeTab() {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+  document.getElementById('tabAnalyze').classList.add('tab-active');
+  document.getElementById('analyzeView').style.display = 'block';
+  document.getElementById('watchlistView').style.display = 'none';
+  if (document.getElementById('historyView')) document.getElementById('historyView').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() { updateWlCount(); });
