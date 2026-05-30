@@ -1,4 +1,4 @@
-/* render.js | v2.1 | 2026-05-30 */
+/* render.js | v2.2 | 2026-05-30 */
 
 // Tooltip helper
 function tip(text) {
@@ -151,6 +151,11 @@ function render(d) {
     <div class="ai-btn-wrap" id="aiBtnWrap">
       <button class="ai-btn" id="gptBtn" onclick="gptAnalyze()">🚀 Deep Analysis with GPT-4.1</button>
       <button class="ai-btn" id="claudeBtn" onclick="claudeOnlyAnalyze()" style="border-color:#e8a87c;color:#e8a87c;margin-top:8px;">🧪 Analyze with Claude (Beta)</button>
+      <div style="margin-top:8px;">
+        <input type="text" id="crisisContext" placeholder="Contexte de crise (ex: conflit Iran-Golfe, selloff SaaS...)"
+          style="width:100%;box-sizing:border-box;padding:9px 12px;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;color:var(--fg);font-family:var(--mono);font-size:12px;margin-bottom:6px;" />
+        <button class="ai-btn" id="crisisBtn" onclick="crisisAnalyze()" style="border-color:#a78bfa;color:#a78bfa;">🌪️ Analyse de crise (décote vs déclin)</button>
+      </div>
       <button class="wl-btn" id="wlBtn" onclick="addCurrentToWatchlist()" style="display:none;">+ Add to Watchlist</button>
     </div>
     <div class="ai-block" id="aiBlock">
