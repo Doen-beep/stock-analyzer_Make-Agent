@@ -210,6 +210,11 @@
     "exchange": "Abu Dhabi"
   },
   {
+    "name": "ADNOC Distribution",
+    "ticker": "ADNOCDIST.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
     "name": "ADNOC Drilling",
     "ticker": "ADNOCDRILL.AB",
     "exchange": "Abu Dhabi"
@@ -272,6 +277,11 @@
   {
     "name": "Dubai Financial Market",
     "ticker": "DFM.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Air Arabia",
+    "ticker": "AIRARABIA.AE",
     "exchange": "Dubai"
   },
   {
