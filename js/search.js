@@ -1,4 +1,4 @@
-/* search.js | v1.3 | 2026-05-24   */
+/* search.js | v1.5 | 2026-05-30   */
 let allCompanies = [];
 let searchOpen = false;
 let searchTimeout = null;
@@ -44,9 +44,28 @@ function initSearch() {
     if (e.key === 'ArrowDown') { e.preventDefault(); navigateDropdown(1); return; }
     if (e.key === 'ArrowUp') { e.preventDefault(); navigateDropdown(-1); return; }
     if (e.key === 'Enter') {
+      // Bloquer tout comportement par défaut / autre handler : sinon Entrée
+      // peut déclencher une SECONDE analyse (avec le texte brut) en plus de
+      // la sélection de la suggestion.
+      e.preventDefault();
+      e.stopPropagation();
       const active = document.querySelector('.search-item.active');
       if (active) { active.click(); return; }
-      if (!searchOpen) analyze();
+      // Pas de suggestion surlignée : tenter de résoudre la saisie libre
+      // vers un vrai ticker (par ticker exact, sinon par nom) avant d'analyser.
+      const q = input.value.trim();
+      if (!q) return;
+      const ql = q.toLowerCase();
+      const exactTicker = allCompanies.find(c => c.ticker.toLowerCase() === ql);
+      const byName = allCompanies.find(c => c.name.toLowerCase() === ql);
+      const firstMatch = allCompanies.find(c =>
+        c.name.toLowerCase().includes(ql) || c.ticker.toLowerCase().includes(ql)
+      );
+      const resolved = exactTicker || byName || firstMatch;
+      if (resolved) { selectTicker(resolved.ticker); return; }
+      // Aucune correspondance : analyser tel quel (peut être un ticker valide non listé)
+      closeDropdown();
+      analyze();
     }
   });
 
