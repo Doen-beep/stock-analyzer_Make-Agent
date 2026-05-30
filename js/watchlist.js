@@ -1,4 +1,4 @@
-/* watchlist.js | v1.8 | 2026-05-24 */
+/* watchlist.js | v1.9 | 2026-05-24 */
 const WATCHLIST_KEY = 'stock_watchlist';
 const CATEGORIES_KEY = 'stock_categories';
 
@@ -39,10 +39,12 @@ function addToWatchlist(data, verdict) {
     currency: cs,
     priceAdded: p.regularMarketPrice,
     priceCurrent: p.regularMarketPrice,
-    quality: verdict.quality || '—',
+    intrinsicValue: verdict.intrinsicValue || '—',
     valuation: verdict.valuation || '—',
     decision: verdict.decision || '—',
     target: verdict.target || '—',
+    scores: verdict.scores || {},
+    overall: verdict.overall || '—',
     category: 'All',
     dateAdded: now.toLocaleDateString('en-GB'),
     dateAnalyzed: now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}),
@@ -129,11 +131,12 @@ function renderWatchlist() {
         <thead>
           <tr>
             <th>Company</th>
+            <th class="num">Intrinsic Value</th>
             <th class="num">Entry Target</th>
             <th class="num">Price Added</th>
             <th class="num">Current Price</th>
             <th class="num">Change</th>
-            <th class="ctr">Quality</th>
+            <th class="ctr">Score</th>
             <th class="ctr">Valuation</th>
             <th class="ctr">Decision</th>
             <th class="ctr">Category</th>
@@ -151,17 +154,28 @@ function renderWatchlist() {
             const catOptions = cats.filter(c => c !== 'All').map(c =>
               `<option value="${c}" ${e.category === c ? 'selected' : ''}>${c}</option>`
             ).join('');
+            const sc = e.scores || {};
+            const scoreTip = [
+              'Business: ' + (sc.business || '—') + '/5',
+              'Moat: ' + (sc.moat || '—') + '/5',
+              'Financials: ' + (sc.financials || '—') + '/5',
+              'Management: ' + (sc.management || '—') + '/5',
+              'Valuation: ' + (sc.valuationScore || '—') + '/5',
+            ].join(' · ');
+            const ov = e.overall && e.overall !== '—' ? e.overall : null;
+            const ovStars = ov ? '★'.repeat(Math.round(parseFloat(ov))) : '';
             return `
             <tr class="wl-row" onclick="loadFromWatchlist('${e.ticker}')">
               <td>
                 <div class="wl-ticker">${e.ticker}</div>
                 <div class="wl-name">${e.name}</div>
               </td>
+              <td class="num mono muted">${e.intrinsicValue || '—'}</td>
               <td class="num mono accent">${e.target}</td>
               <td class="num mono muted">${e.currency}${Number(e.priceAdded||0).toFixed(2)}</td>
               <td class="num mono bold" id="wl-price-${e.ticker}">${e.currency}${Number(e.priceCurrent||0).toFixed(2)}</td>
               <td class="num mono" style="color:${varColor}">${varSign}${varPct.toFixed(2)}%</td>
-              <td class="ctr small">${e.quality}</td>
+              <td class="ctr small" title="${scoreTip}">${ov ? `<span style="color:#f5c842">${ovStars}</span> ${ov}/5` : '—'}</td>
               <td class="ctr small">${e.valuation}</td>
               <td class="ctr small ${decisionClass}">${e.decision}</td>
               <td class="ctr" onclick="event.stopPropagation()">
