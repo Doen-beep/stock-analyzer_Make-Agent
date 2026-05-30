@@ -1,4 +1,4 @@
-/* api/openai-analysis.js | v1.8 | 2026-05-25 */
+/* api/openai-analysis.js | v1.9 | 2026-05-25 */
 
 export const config = { maxDuration: 60 };
 
@@ -8,11 +8,18 @@ const SYSTEM_PROMPT = `You are a senior financial analyst specializing in value 
 
 You receive real-time market data for a publicly traded company. 
 
+## ⛔ NON-NEGOTIABLE OUTPUT CONTRACT — READ FIRST
+Your response is INVALID and useless unless it ends with BOTH tables from Phase 5 (the Verdict table AND the Scorecard table), fully filled with concrete numbers.
+- You MUST complete all 5 phases. Never stop early, never abbreviate, never skip a phase.
+- The two Phase 5 tables are the single most important part of your output. If you are running low on space, SHORTEN phases 1-4 — but ALWAYS produce both final tables in full.
+- If web searches fail or data is missing, estimate from the market data provided and the figures you do have, state your assumption in one line, and STILL produce both tables. "Data unavailable" is never an excuse to omit the verdict.
+- Every row of both tables must contain a real value — never leave a cell blank, never write "XXX" or a placeholder.
+
 ## CRITICAL RULES BEFORE STARTING
 - The provided data reflects CURRENT market conditions only — it may be distorted by temporary cycles (semiconductor downturn, post-COVID normalization, etc.)
 - NEVER use current FCF or earnings blindly if they appear abnormally low or negative — search for historical data first
 - For cyclical companies (semiconductors, mining, energy, automotive), ALWAYS normalize earnings over a full cycle before calculating intrinsic value
-- Search the web aggressively for historical financial data before any calculation
+- Search the web for historical financial data before calculating, but if a search returns nothing useful, move on quickly — do not let searching derail the analysis
 
 Your analysis MUST follow these 5 phases STRICTLY in order:
 
@@ -60,8 +67,10 @@ Only NOW compare intrinsic value to current price.
 - Margin of safety = (intrinsic value - current price) / intrinsic value
 - Is the stock undervalued, fairly valued, or overvalued?
 
-## PHASE 5 — FINAL VERDICT
-End with this EXACT summary table:
+## PHASE 5 — FINAL VERDICT (MANDATORY — ALWAYS PRODUCE THIS)
+You MUST end EVERY analysis with the two tables below, fully filled. This is the contract from the top of this prompt. Do not add commentary after the Scorecard.
+
+First, this EXACT summary table:
 
 | Metric | Value |
 |--------|-------|
@@ -74,7 +83,7 @@ End with this EXACT summary table:
 | Pessimistic Value (-20%) | $XXX |
 | Optimistic Value (+20%) | $XXX |
 
-Then add a SCORECARD table with ratings out of 5:
+Then this SCORECARD table with ratings out of 5 (every row required):
 
 | Component | Score | Comment |
 |-----------|-------|---------|
@@ -120,9 +129,10 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'gpt-4.1',
         max_output_tokens: 16000,
+        temperature: 0.25,
         tools: [{ type: 'web_search_preview' }],
         instructions: SYSTEM_PROMPT,
-        input: `Analyze ${ticker} following the 5-phase Buffett methodology.\n\nReal-time market data:\n${JSON.stringify(marketData, null, 2)}`,
+        input: `Analyze ${ticker} following the 5-phase Buffett methodology. Remember: you MUST finish with both Phase 5 tables fully filled, whatever happens with the web searches.\n\nReal-time market data:\n${JSON.stringify(marketData, null, 2)}`,
       }),
     });
 
@@ -142,19 +152,28 @@ export default async function handler(req, res) {
     // half-written analysis with a blank verdict banner.
     const reason = result.incomplete_details?.reason
       || (msgBlock?.status === 'incomplete' ? 'message_incomplete' : null);
+
+    // The model sometimes returns status:completed but abbreviates and omits the
+    // final tables. Detect that the verdict table is actually present.
+    const hasVerdictTable = /Intrinsic Value/i.test(text) && /Decision/i.test(text) && /\/5/.test(text);
+
     const incomplete = result.status === 'incomplete'
       || msgBlock?.status === 'incomplete'
-      || result.incomplete_details != null;
+      || result.incomplete_details != null
+      || !hasVerdictTable;
+
+    const finalReason = reason || (!hasVerdictTable ? 'missing_verdict_table' : null);
 
     // Diagnostic visible dans les logs Vercel (Functions → Logs)
     console.log('[openai-analysis]', JSON.stringify({
       status: result.status,
-      reason,
+      reason: finalReason,
+      hasVerdictTable,
       textLen: text.length,
       usage: result.usage || null,
     }));
 
-    res.status(200).json({ text, incomplete: !!incomplete, reason });
+    res.status(200).json({ text, incomplete: !!incomplete, reason: finalReason });
 
   } catch(e) {
     res.status(500).json({ error: e.message });
