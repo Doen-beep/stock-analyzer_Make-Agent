@@ -1,4 +1,4 @@
-/* utils.js | v1.2 | 2026-05-24 */
+/* utils.js | v1.3 | 2026-05-24 */
 const fmt  = (n, d=2) => n == null || isNaN(n) ? '—' : Number(n).toFixed(d);
 const fmtB = n => n == null ? '—' : (n/1e9 >= 1000 ? (n/1e12).toFixed(1)+'T' : (n/1e9).toFixed(1)+'B');
 const fmtM = n => n == null ? '—' : (n/1e6).toFixed(1)+'M';
@@ -45,5 +45,8 @@ function getRegion(ticker) {
   if (ticker.endsWith('.HK')) return 'HK';   // Hong Kong
   if (ticker.endsWith('.SR')) return 'SA';   // Tadawul (Arabie saoudite)
   if (ticker.endsWith('.QA')) return 'QA';   // Qatar Exchange
+  if (ticker.endsWith('.AB')) return 'AE';   // Abu Dhabi (ADX)
+  if (ticker.endsWith('.AE')) return 'AE';   // Dubai (DFM)
+  if (ticker.endsWith('.KW')) return 'KW';   // Boursa Kuwait
   return 'US'; // défaut
 }
