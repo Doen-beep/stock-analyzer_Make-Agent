@@ -1,4 +1,4 @@
-/* markdown.js | v1.9 | 2026-05-24 */
+/* markdown.js | v2.0 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -6,16 +6,41 @@ function renderMarkdown(text) {
   let inTable = false;
   let tableRows = [];
 
+  // Escape HTML and apply inline bold/italic — used for table cells, which are
+  // processed separately from the main line loop.
+  function inlineFmt(s) {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  }
+
+  // Split a markdown table row into cells WITHOUT dropping empty ones.
+  // We strip only the leading/trailing border pipes, then split on the rest,
+  // so "| Management | 3/5 |  |" keeps its empty 3rd cell.
+  function splitRow(row) {
+    let s = row.trim();
+    if (s.startsWith('|')) s = s.slice(1);
+    if (s.endsWith('|')) s = s.slice(0, -1);
+    return s.split('|').map(c => c.trim());
+  }
+
   function flushTable() {
     if (!tableRows.length) return;
-    const dataRows = tableRows.filter(r => !r.match(/^\|[-| :]+\|$/));
+    const dataRows = tableRows.filter(r => !r.match(/^\s*\|?[-| :]+\|?\s*$/));
     if (dataRows.length < 2) { tableRows = []; return; }
-    const headers = dataRows[0].split('|').filter(s => s.trim());
-    const ths = headers.map(s => '<th>' + s.trim() + '</th>').join('');
+    const headers = splitRow(dataRows[0]);
+    const cols = headers.length;
+    const ths = headers.map(s => '<th>' + inlineFmt(s) + '</th>').join('');
     let trs = '';
     for (let r = 1; r < dataRows.length; r++) {
-      const cells = dataRows[r].split('|').filter(s => s.trim());
-      trs += '<tr>' + cells.map(s => '<td>' + s.trim() + '</td>').join('') + '</tr>';
+      const cells = splitRow(dataRows[r]);
+      // Pad short rows / trim long rows so every row matches the header width
+      while (cells.length < cols) cells.push('');
+      if (cells.length > cols) cells.length = cols;
+      trs += '<tr>' + cells.map(s => '<td>' + inlineFmt(s) + '</td>').join('') + '</tr>';
     }
     html += '<table><thead><tr>' + ths + '</tr></thead><tbody>' + trs + '</tbody></table>';
     tableRows = [];
@@ -83,59 +108,6 @@ function renderMarkdown(text) {
   return '<div class="ai-body">' + html + '</div>';
 }
 
-
-function extractScorecard(text) {
-  const banner = document.getElementById('verdictBanner');
-  if (!banner) return;
-
-  // Extraire Intrinsic Value
-  const ivMatch = text.match(/Intrinsic Value.*?\|.*?([€$][\d,.-]+(?:\s*[–-]\s*[€$][\d,.-]+)?)/i);
-  if (ivMatch) {
-    const el = document.getElementById('vIV');
-    if (el) el.textContent = ivMatch[1].trim();
-  }
-
-  // Extraire Entry Target Price
-  const etpMatch = text.match(/Entry Target.*?\|.*?([€$][\d,.-]+(?:\s*[–-]\s*[€$][\d,.-]+)?)/i);
-  if (etpMatch) {
-    const el = document.getElementById('vETP');
-    if (el) el.textContent = etpMatch[1].trim();
-  }
-
-  // Extraire Current Price
-  const cpMatch = text.match(/Current Price.*?\|.*?([€$][\d,.-]+)/i);
-  if (cpMatch) {
-    const el = document.getElementById('vCP');
-    if (el) el.textContent = cpMatch[1].trim();
-  }
-
-  // Extraire scores du scorecard
-  const scoreMap = {
-    'Business': 'sBusiness',
-    'Moat': 'sMoat',
-    'Financials?': 'sFinance',
-    'Management': 'sManagement',
-    'Valuation': 'sValuation',
-    'Overall': 'sOverall',
-  };
-
-  for (const [key, id] of Object.entries(scoreMap)) {
-    const re = new RegExp(key + '.*?\|.*?(\d(?:\.\d)?)\/5', 'i');
-    const m = text.match(re);
-    if (m) {
-      const el = document.getElementById(id);
-      if (el) {
-        const score = parseFloat(m[1]);
-        const stars = '★'.repeat(Math.round(score)) + '☆'.repeat(5 - Math.round(score));
-        el.innerHTML = '<span style="color:#f5c842;">' + stars + '</span> <span style="font-weight:600;">' + m[1] + '/5</span>';
-      }
-    }
-  }
-
-  // Afficher la section scorecard si des données trouvées
-  const sc = document.getElementById('scorecardBanner');
-  if (sc && (ivMatch || etpMatch)) sc.style.display = 'block';
-}
 
 function extractVerdict(text) {
   // Créer ou récupérer le bandeau unique
@@ -219,12 +191,16 @@ function extractVerdict(text) {
     }
   }
 
+  // Currency-symbol class covering USD/EUR/GBP/JPY/KRW/INR plus textual CHF/CAD/etc.
+  const CUR = '(?:[€$£¥₩₹]|CHF|CA\\$|S\\$|[A-Z]{3}\\s?)';
+  const VAL = '(' + CUR + '?\\s*[\\d,.]+(?:\\s*[-–]\\s*' + CUR + '?\\s*[\\d,.]+)?)';
+
   // Intrinsic Value
-  const ivMatch = text.match(/Intrinsic Value.*?\|.*?([€$][\d,.-]+(?:\s*[-–]\s*[€$][\d,.-]+)?)/i);
+  const ivMatch = text.match(new RegExp('Intrinsic Value.*?\\|.*?' + VAL, 'i'));
   if (ivMatch) { const el = document.getElementById('vIV'); if (el) el.textContent = ivMatch[1].trim(); }
 
   // Entry Target
-  const etpMatch = text.match(/Entry Target.*?\|.*?([€$][\d,.-]+)/i);
+  const etpMatch = text.match(new RegExp('Entry Target.*?\\|.*?' + VAL, 'i'));
   if (etpMatch) { const el = document.getElementById('vETP'); if (el) el.textContent = etpMatch[1].trim(); }
 
   // Margin of Safety
@@ -249,7 +225,8 @@ function extractVerdict(text) {
     ['Valuation', 'sValuation'],
   ];
   for (const [key, id] of scoreMap) {
-    const re = new RegExp(key + '\\s*\\|\\s*(\\d(?:\\.\\d)?)\\/5', 'i');
+    // Tolerate bold markers (**Valuation**), extra spaces, and "4 / 5" spacing.
+    const re = new RegExp('\\**\\s*' + key + '\\s*\\**\\s*\\|\\s*\\**\\s*(\\d(?:\\.\\d)?)\\s*\\/\\s*5', 'i');
     const m = text.match(re);
     if (m) {
       const el = document.getElementById(id);
@@ -275,5 +252,3 @@ function extractVerdict(text) {
 function updateScorecard(text) {
   if (document.getElementById('verdictBanner')) extractVerdict(text);
 }
-
-// Appeler extractScorecard après chaque mise à jour du texte
