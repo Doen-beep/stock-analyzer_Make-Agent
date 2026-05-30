@@ -88,6 +88,7 @@
   {"name":"Zoetis","ticker":"ZTS","exchange":"NYSE"},
   {"name":"Colgate-Palmolive","ticker":"CL","exchange":"NYSE"},
   {"name":"General Electric","ticker":"GE","exchange":"NYSE"},
+  {"name":"GE Vernova","ticker":"GEV","exchange":"NYSE"},
   {"name":"Target","ticker":"TGT","exchange":"NYSE"},
   {"name":"Northrop Grumman","ticker":"NOC","exchange":"NYSE"},
   {"name":"Analog Devices","ticker":"ADI","exchange":"NASDAQ"},
