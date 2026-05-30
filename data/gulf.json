@@ -1,38 +1,317 @@
 [
-  {"name":"Saudi Aramco","ticker":"2222.SR","exchange":"Tadawul"},
-  {"name":"Al Rajhi Bank","ticker":"1120.SR","exchange":"Tadawul"},
-  {"name":"Saudi National Bank","ticker":"1180.SR","exchange":"Tadawul"},
-  {"name":"STC (Saudi Telecom)","ticker":"7010.SR","exchange":"Tadawul"},
-  {"name":"SABIC","ticker":"2010.SR","exchange":"Tadawul"},
-  {"name":"ACWA Power","ticker":"2082.SR","exchange":"Tadawul"},
-  {"name":"Maaden (Saudi Arabian Mining)","ticker":"1211.SR","exchange":"Tadawul"},
-  {"name":"Riyad Bank","ticker":"1010.SR","exchange":"Tadawul"},
-  {"name":"Alinma Bank","ticker":"1150.SR","exchange":"Tadawul"},
-  {"name":"Dr. Sulaiman Al-Habib","ticker":"4013.SR","exchange":"Tadawul"},
-  {"name":"Saudi Electricity","ticker":"5110.SR","exchange":"Tadawul"},
-  {"name":"Almarai","ticker":"2280.SR","exchange":"Tadawul"},
-  {"name":"SABIC Agri-Nutrients","ticker":"2020.SR","exchange":"Tadawul"},
-  {"name":"Saudi Tadawul Group","ticker":"1111.SR","exchange":"Tadawul"},
-  {"name":"The Saudi British Bank (SABB)","ticker":"1060.SR","exchange":"Tadawul"},
-  {"name":"Banque Saudi Fransi","ticker":"1050.SR","exchange":"Tadawul"},
-  {"name":"Arab National Bank","ticker":"1080.SR","exchange":"Tadawul"},
-  {"name":"Bank Albilad","ticker":"1140.SR","exchange":"Tadawul"},
-  {"name":"Yanbu National Petrochemical (Yansab)","ticker":"2290.SR","exchange":"Tadawul"},
-  {"name":"Saudi Kayan Petrochemical","ticker":"2350.SR","exchange":"Tadawul"},
-  {"name":"Advanced Petrochemical","ticker":"2330.SR","exchange":"Tadawul"},
-  {"name":"Petro Rabigh","ticker":"2380.SR","exchange":"Tadawul"},
-  {"name":"Saudi Cement","ticker":"3030.SR","exchange":"Tadawul"},
-  {"name":"Mouwasat Medical Services","ticker":"4002.SR","exchange":"Tadawul"},
-  {"name":"Jarir Marketing","ticker":"4190.SR","exchange":"Tadawul"},
-  {"name":"Bupa Arabia","ticker":"8210.SR","exchange":"Tadawul"},
-  {"name":"Etihad Etisalat (Mobily)","ticker":"7020.SR","exchange":"Tadawul"},
-  {"name":"Qatar National Bank","ticker":"QNBK.QA","exchange":"Qatar"},
-  {"name":"Industries Qatar","ticker":"IQCD.QA","exchange":"Qatar"},
-  {"name":"Qatar Islamic Bank","ticker":"QIBK.QA","exchange":"Qatar"},
-  {"name":"Masraf Al Rayan","ticker":"MARK.QA","exchange":"Qatar"},
-  {"name":"Ooredoo","ticker":"ORDS.QA","exchange":"Qatar"},
-  {"name":"Qatar Fuel (WOQOD)","ticker":"QFLS.QA","exchange":"Qatar"},
-  {"name":"Qatar Gas Transport (Nakilat)","ticker":"QGTS.QA","exchange":"Qatar"},
-  {"name":"Commercial Bank of Qatar","ticker":"CBQK.QA","exchange":"Qatar"},
-  {"name":"Mesaieed Petrochemical Holding","ticker":"MPHC.QA","exchange":"Qatar"}
+  {
+    "name": "Saudi Aramco",
+    "ticker": "2222.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Al Rajhi Bank",
+    "ticker": "1120.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Saudi National Bank",
+    "ticker": "1180.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "STC (Saudi Telecom)",
+    "ticker": "7010.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "SABIC",
+    "ticker": "2010.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "ACWA Power",
+    "ticker": "2082.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Maaden (Saudi Arabian Mining)",
+    "ticker": "1211.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Riyad Bank",
+    "ticker": "1010.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Alinma Bank",
+    "ticker": "1150.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Dr. Sulaiman Al-Habib",
+    "ticker": "4013.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Saudi Electricity",
+    "ticker": "5110.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Almarai",
+    "ticker": "2280.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "SABIC Agri-Nutrients",
+    "ticker": "2020.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Saudi Tadawul Group",
+    "ticker": "1111.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "The Saudi British Bank (SABB)",
+    "ticker": "1060.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Banque Saudi Fransi",
+    "ticker": "1050.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Arab National Bank",
+    "ticker": "1080.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Bank Albilad",
+    "ticker": "1140.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Yanbu National Petrochemical (Yansab)",
+    "ticker": "2290.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Saudi Kayan Petrochemical",
+    "ticker": "2350.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Advanced Petrochemical",
+    "ticker": "2330.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Petro Rabigh",
+    "ticker": "2380.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Saudi Cement",
+    "ticker": "3030.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Mouwasat Medical Services",
+    "ticker": "4002.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Jarir Marketing",
+    "ticker": "4190.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Bupa Arabia",
+    "ticker": "8210.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Etihad Etisalat (Mobily)",
+    "ticker": "7020.SR",
+    "exchange": "Tadawul"
+  },
+  {
+    "name": "Qatar National Bank",
+    "ticker": "QNBK.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "Industries Qatar",
+    "ticker": "IQCD.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "Qatar Islamic Bank",
+    "ticker": "QIBK.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "Masraf Al Rayan",
+    "ticker": "MARK.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "Ooredoo",
+    "ticker": "ORDS.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "Qatar Fuel (WOQOD)",
+    "ticker": "QFLS.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "Qatar Gas Transport (Nakilat)",
+    "ticker": "QGTS.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "Commercial Bank of Qatar",
+    "ticker": "CBQK.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "Mesaieed Petrochemical Holding",
+    "ticker": "MPHC.QA",
+    "exchange": "Qatar"
+  },
+  {
+    "name": "First Abu Dhabi Bank",
+    "ticker": "FAB.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Emirates Telecom (e&)",
+    "ticker": "EAND.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Abu Dhabi Commercial Bank",
+    "ticker": "ADCB.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Abu Dhabi Islamic Bank",
+    "ticker": "ADIB.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Aldar Properties",
+    "ticker": "ALDAR.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "ADNOC Gas",
+    "ticker": "ADNOCGAS.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "ADNOC Drilling",
+    "ticker": "ADNOCDRILL.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "International Holding Company",
+    "ticker": "IHC.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Multiply Group",
+    "ticker": "MULTIPLY.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Pure Health Holding",
+    "ticker": "PUREHEALTH.AB",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Emirates NBD",
+    "ticker": "EMIRATESNBD.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Emaar Properties",
+    "ticker": "EMAAR.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Dubai Islamic Bank",
+    "ticker": "DIB.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Dubai Electricity & Water (DEWA)",
+    "ticker": "DEWA.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Mashreqbank",
+    "ticker": "MASQ.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Commercial Bank of Dubai",
+    "ticker": "CBD.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Emaar Development",
+    "ticker": "EMAARDEV.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Salik Company",
+    "ticker": "SALIK.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Dubai Financial Market",
+    "ticker": "DFM.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Kuwait Finance House",
+    "ticker": "KFH.KW",
+    "exchange": "Kuwait"
+  },
+  {
+    "name": "National Bank of Kuwait",
+    "ticker": "NBK.KW",
+    "exchange": "Kuwait"
+  },
+  {
+    "name": "Boubyan Bank",
+    "ticker": "BOUBYAN.KW",
+    "exchange": "Kuwait"
+  },
+  {
+    "name": "Burgan Bank",
+    "ticker": "BURG.KW",
+    "exchange": "Kuwait"
+  },
+  {
+    "name": "Kuwait International Bank",
+    "ticker": "KIB.KW",
+    "exchange": "Kuwait"
+  },
+  {
+    "name": "Agility Public Warehousing",
+    "ticker": "AGLTY.KW",
+    "exchange": "Kuwait"
+  },
+  {
+    "name": "Mobile Telecom (Zain)",
+    "ticker": "ZAIN.KW",
+    "exchange": "Kuwait"
+  },
+  {
+    "name": "Gulf Bank",
+    "ticker": "GBK.KW",
+    "exchange": "Kuwait"
+  }
 ]
