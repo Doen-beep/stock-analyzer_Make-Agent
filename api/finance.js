@@ -1,4 +1,4 @@
-/* api/finance.js | v1.2 | 2026-05-30 */
+/* api/finance.js | v1.4 | 2026-05-30 */
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
 
 export default async function handler(req, res) {
@@ -26,6 +26,8 @@ export default async function handler(req, res) {
 
     // Diagnostic visible dans les logs Vercel
     console.log('[finance]', JSON.stringify({ symbol, region: region || 'US', status: response.status, len: raw.length }));
+    // Dump du corps brut quand la réponse est courte (diagnostic structure)
+    if (raw.length < 1200) console.log('[finance-raw]', raw);
 
     if (!response.ok) {
       // 404 / pas de données → message clair, pas un 500
@@ -42,7 +44,10 @@ export default async function handler(req, res) {
     // Réponse OK mais sans prix → ticker probablement inexistant
     const price = data?.price?.regularMarketPrice ?? data?.quoteSummary?.result?.[0]?.price?.regularMarketPrice;
     if (price == null) {
-      return res.status(404).json({ error: `No price data for "${symbol}". The ticker may not exist or this market may not be covered.` });
+      return res.status(404).json({
+        error: `No price data for "${symbol}". The ticker may not exist or this market may not be covered.`,
+        _debug: raw.slice(0, 500)
+      });
     }
 
     res.status(200).json({ data });
