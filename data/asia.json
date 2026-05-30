@@ -330,36 +330,6 @@
     "exchange": "Mumbai"
   },
   {
-    "name": "Emirates NBD",
-    "ticker": "ENBD.AE",
-    "exchange": "Dubai"
-  },
-  {
-    "name": "First Abu Dhabi Bank",
-    "ticker": "FAB.AE",
-    "exchange": "Abu Dhabi"
-  },
-  {
-    "name": "DP World",
-    "ticker": "DPW.AE",
-    "exchange": "Dubai"
-  },
-  {
-    "name": "ADNOC Distribution",
-    "ticker": "ADNOCDIST.AE",
-    "exchange": "Abu Dhabi"
-  },
-  {
-    "name": "Emaar Properties",
-    "ticker": "EMAAR.AE",
-    "exchange": "Dubai"
-  },
-  {
-    "name": "Aldar Properties",
-    "ticker": "ALDAR.AE",
-    "exchange": "Abu Dhabi"
-  },
-  {
     "name": "Bank Central Asia",
     "ticker": "BBCA.JK",
     "exchange": "Jakarta"
