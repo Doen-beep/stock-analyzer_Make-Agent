@@ -1,8 +1,75 @@
-/* render.js | v2.0 | 2026-05-24 */
+/* render.js | v2.1 | 2026-05-30 */
 
 // Tooltip helper
 function tip(text) {
   return `<span class="tip" title="${text}">?</span>`;
+}
+
+// Convertit un ticker Yahoo en symbole TradingView (EXCHANGE:SYMBOL).
+// TradingView utilise des préfixes de bourse, pas les suffixes Yahoo.
+function tvSymbol(ticker) {
+  if (!ticker) return '';
+  const t = ticker.toUpperCase();
+  // Suffixes Yahoo → préfixe de bourse TradingView
+  const suffixMap = {
+    '.T':   s => 'TSE:'   + s,   // Tokyo
+    '.PA':  s => 'EURONEXT:' + s, // Paris
+    '.AS':  s => 'EURONEXT:' + s, // Amsterdam
+    '.BR':  s => 'EURONEXT:' + s, // Bruxelles
+    '.LS':  s => 'EURONEXT:' + s, // Lisbonne
+    '.DE':  s => 'XETR:'  + s,   // Xetra
+    '.L':   s => 'LSE:'   + s,   // Londres
+    '.SW':  s => 'SIX:'   + s,   // Suisse
+    '.MI':  s => 'MIL:'   + s,   // Milan
+    '.MC':  s => 'BME:'   + s,   // Madrid
+    '.TO':  s => 'TSX:'   + s,   // Toronto
+    '.HK':  s => 'HKEX:'  + s,   // Hong Kong
+    '.SR':  s => 'TADAWUL:' + s, // Tadawul
+    '.QA':  s => 'QSE:'   + s,   // Qatar
+    '.AE':  s => 'DFM:'   + s,   // Dubai
+    '.AB':  s => 'ADX:'   + s,   // Abu Dhabi
+    '.KW':  s => 'KSE:'   + s,   // Koweït
+  };
+  for (const [suffix, fn] of Object.entries(suffixMap)) {
+    if (t.endsWith(suffix)) return fn(t.slice(0, -suffix.length));
+  }
+  // Pas de suffixe → action US, laisser TradingView résoudre la bourse
+  return t;
+}
+
+// Construit le widget graphique TradingView (courbe de zone, 12 mois par défaut)
+function renderChart(ticker) {
+  const tvSym = tvSymbol(ticker);
+  if (!tvSym) return '';
+  return `
+    <div class="price-chart" style="margin:0 0 4px;border-bottom:0.5px solid var(--border);">
+      <div id="tvChart" style="height:280px;width:100%;"></div>
+    </div>`;
+}
+
+function mountChart(ticker) {
+  const tvSym = tvSymbol(ticker);
+  const el = document.getElementById('tvChart');
+  if (!el || !tvSym) return;
+  el.innerHTML = '';
+  function build() {
+    /* global TradingView */
+    if (typeof TradingView === 'undefined') { setTimeout(build, 200); return; }
+    new TradingView.widget({
+      container_id: 'tvChart',
+      symbol: tvSym,
+      autosize: true,
+      style: '3',          // 3 = area (courbe de zone)
+      range: '12M',        // 1 an par défaut
+      theme: 'dark',
+      locale: 'fr',
+      hide_top_toolbar: false,
+      hide_legend: false,
+      allow_symbol_change: false,
+      backgroundColor: 'rgba(0,0,0,0)',
+    });
+  }
+  build();
 }
 
 function render(d) {
@@ -31,6 +98,8 @@ function render(d) {
         ${p.postMarketPrice ? `<div class="change ${cc(p.postMarketChange)}" style="font-size:11px;margin-top:2px">After-hours ${cs}${fmt(p.postMarketPrice)} ${p.postMarketChange >= 0 ? '+' : ''}${fmt(p.postMarketChange)}</div>` : ''}
       </div>
     </div>
+
+    ${renderChart(sym)}
 
     <div class="grid">
       <div class="section"><h3>Session</h3>
@@ -92,4 +161,5 @@ function render(d) {
 
   document.getElementById('card').style.display = 'block';
   document.getElementById('aiBtnWrap').style.display = 'block';
+  mountChart(sym);
 }
