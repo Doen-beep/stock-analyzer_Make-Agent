@@ -1,84 +1,602 @@
 [
-  {"name":"Toyota Motor","ticker":"7203.T","exchange":"Tokyo"},
-  {"name":"Sony Group","ticker":"6758.T","exchange":"Tokyo"},
-  {"name":"Keyence","ticker":"6861.T","exchange":"Tokyo"},
-  {"name":"Shin-Etsu Chemical","ticker":"4063.T","exchange":"Tokyo"},
-  {"name":"Recruit Holdings","ticker":"6098.T","exchange":"Tokyo"},
-  {"name":"Mitsubishi UFJ Financial","ticker":"8306.T","exchange":"Tokyo"},
-  {"name":"Sumitomo Mitsui Financial","ticker":"8316.T","exchange":"Tokyo"},
-  {"name":"SoftBank Group","ticker":"9984.T","exchange":"Tokyo"},
-  {"name":"Fast Retailing","ticker":"9983.T","exchange":"Tokyo"},
-  {"name":"Fanuc","ticker":"6954.T","exchange":"Tokyo"},
-  {"name":"Nintendo","ticker":"7974.T","exchange":"Tokyo"},
-  {"name":"Hitachi","ticker":"6501.T","exchange":"Tokyo"},
-  {"name":"Panasonic","ticker":"6752.T","exchange":"Tokyo"},
-  {"name":"Canon","ticker":"7751.T","exchange":"Tokyo"},
-  {"name":"Honda Motor","ticker":"7267.T","exchange":"Tokyo"},
-  {"name":"Nissan Motor","ticker":"7201.T","exchange":"Tokyo"},
-  {"name":"Daikin Industries","ticker":"6367.T","exchange":"Tokyo"},
-  {"name":"Murata Manufacturing","ticker":"6981.T","exchange":"Tokyo"},
-  {"name":"TDK","ticker":"6762.T","exchange":"Tokyo"},
-  {"name":"Olympus","ticker":"7733.T","exchange":"Tokyo"},
-  {"name":"Bridgestone","ticker":"5108.T","exchange":"Tokyo"},
-  {"name":"NTT","ticker":"9432.T","exchange":"Tokyo"},
-  {"name":"KDDI","ticker":"9433.T","exchange":"Tokyo"},
-  {"name":"SoftBank Corp","ticker":"9434.T","exchange":"Tokyo"},
-  {"name":"Seven & I Holdings","ticker":"3382.T","exchange":"Tokyo"},
-  {"name":"Aeon","ticker":"8267.T","exchange":"Tokyo"},
-  {"name":"Tokio Marine","ticker":"8766.T","exchange":"Tokyo"},
-  {"name":"Mizuho Financial","ticker":"8411.T","exchange":"Tokyo"},
-  {"name":"Samsung Electronics","ticker":"005930.KS","exchange":"Seoul"},
-  {"name":"SK Hynix","ticker":"000660.KS","exchange":"Seoul"},
-  {"name":"LG Energy Solution","ticker":"373220.KS","exchange":"Seoul"},
-  {"name":"Samsung Biologics","ticker":"207940.KS","exchange":"Seoul"},
-  {"name":"Hyundai Motor","ticker":"005380.KS","exchange":"Seoul"},
-  {"name":"Kia","ticker":"000270.KS","exchange":"Seoul"},
-  {"name":"POSCO Holdings","ticker":"005490.KS","exchange":"Seoul"},
-  {"name":"Celltrion","ticker":"068270.KS","exchange":"Seoul"},
-  {"name":"KB Financial","ticker":"105560.KS","exchange":"Seoul"},
-  {"name":"Shinhan Financial","ticker":"055550.KS","exchange":"Seoul"},
-  {"name":"LG Chem","ticker":"051910.KS","exchange":"Seoul"},
-  {"name":"Kakao","ticker":"035720.KS","exchange":"Seoul"},
-  {"name":"Naver","ticker":"035420.KS","exchange":"Seoul"},
-  {"name":"Singapore Airlines","ticker":"C6L.SI","exchange":"Singapore"},
-  {"name":"DBS Group","ticker":"D05.SI","exchange":"Singapore"},
-  {"name":"OCBC Bank","ticker":"O39.SI","exchange":"Singapore"},
-  {"name":"UOB","ticker":"U11.SI","exchange":"Singapore"},
-  {"name":"Wilmar International","ticker":"F34.SI","exchange":"Singapore"},
-  {"name":"CapitaLand Investment","ticker":"9CI.SI","exchange":"Singapore"},
-  {"name":"Jardine Matheson","ticker":"J36.SI","exchange":"Singapore"},
-  {"name":"Sea Limited","ticker":"SE","exchange":"NYSE"},
-  {"name":"Grab Holdings","ticker":"GRAB","exchange":"NASDAQ"},
-  {"name":"Reliance Industries","ticker":"RELIANCE.NS","exchange":"Mumbai"},
-  {"name":"Tata Consultancy Services","ticker":"TCS.NS","exchange":"Mumbai"},
-  {"name":"HDFC Bank","ticker":"HDFCBANK.NS","exchange":"Mumbai"},
-  {"name":"Infosys","ticker":"INFY.NS","exchange":"Mumbai"},
-  {"name":"ICICI Bank","ticker":"ICICIBANK.NS","exchange":"Mumbai"},
-  {"name":"Hindustan Unilever","ticker":"HINDUNILVR.NS","exchange":"Mumbai"},
-  {"name":"ITC","ticker":"ITC.NS","exchange":"Mumbai"},
-  {"name":"State Bank of India","ticker":"SBIN.NS","exchange":"Mumbai"},
-  {"name":"Bajaj Finance","ticker":"BAJFINANCE.NS","exchange":"Mumbai"},
-  {"name":"Wipro","ticker":"WIPRO.NS","exchange":"Mumbai"},
-  {"name":"HCL Technologies","ticker":"HCLTECH.NS","exchange":"Mumbai"},
-  {"name":"Larsen & Toubro","ticker":"LT.NS","exchange":"Mumbai"},
-  {"name":"Axis Bank","ticker":"AXISBANK.NS","exchange":"Mumbai"},
-  {"name":"Maruti Suzuki","ticker":"MARUTI.NS","exchange":"Mumbai"},
-  {"name":"Tata Motors","ticker":"TATAMOTORS.NS","exchange":"Mumbai"},
-  {"name":"Emirates NBD","ticker":"ENBD.AE","exchange":"Dubai"},
-  {"name":"First Abu Dhabi Bank","ticker":"FAB.AE","exchange":"Abu Dhabi"},
-  {"name":"DP World","ticker":"DPW.AE","exchange":"Dubai"},
-  {"name":"ADNOC Distribution","ticker":"ADNOCDIST.AE","exchange":"Abu Dhabi"},
-  {"name":"Emaar Properties","ticker":"EMAAR.AE","exchange":"Dubai"},
-  {"name":"Aldar Properties","ticker":"ALDAR.AE","exchange":"Abu Dhabi"},
-  {"name":"Bank Central Asia","ticker":"BBCA.JK","exchange":"Jakarta"},
-  {"name":"Bank Mandiri","ticker":"BMRI.JK","exchange":"Jakarta"},
-  {"name":"Bank Rakyat Indonesia","ticker":"BBRI.JK","exchange":"Jakarta"},
-  {"name":"Telkom Indonesia","ticker":"TLKM.JK","exchange":"Jakarta"},
-  {"name":"Astra International","ticker":"ASII.JK","exchange":"Jakarta"},
-  {"name":"Unilever Indonesia","ticker":"UNVR.JK","exchange":"Jakarta"},
-  {"name":"Vingroup","ticker":"VIC.VN","exchange":"Ho Chi Minh"},
-  {"name":"Vinhomes","ticker":"VHM.VN","exchange":"Ho Chi Minh"},
-  {"name":"Vietcombank","ticker":"VCB.VN","exchange":"Ho Chi Minh"},
-  {"name":"BIDV","ticker":"BID.VN","exchange":"Ho Chi Minh"},
-  {"name":"FPT Corporation","ticker":"FPT.VN","exchange":"Ho Chi Minh"}
+  {
+    "name": "Toyota Motor",
+    "ticker": "7203.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Sony Group",
+    "ticker": "6758.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Keyence",
+    "ticker": "6861.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Shin-Etsu Chemical",
+    "ticker": "4063.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Recruit Holdings",
+    "ticker": "6098.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Mitsubishi UFJ Financial",
+    "ticker": "8306.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Sumitomo Mitsui Financial",
+    "ticker": "8316.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "SoftBank Group",
+    "ticker": "9984.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Fast Retailing",
+    "ticker": "9983.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Fanuc",
+    "ticker": "6954.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Yaskawa Electric",
+    "ticker": "6506.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Nintendo",
+    "ticker": "7974.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Hitachi",
+    "ticker": "6501.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Panasonic",
+    "ticker": "6752.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Canon",
+    "ticker": "7751.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Honda Motor",
+    "ticker": "7267.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Nissan Motor",
+    "ticker": "7201.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Daikin Industries",
+    "ticker": "6367.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Murata Manufacturing",
+    "ticker": "6981.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "TDK",
+    "ticker": "6762.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Olympus",
+    "ticker": "7733.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Bridgestone",
+    "ticker": "5108.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "NTT",
+    "ticker": "9432.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "KDDI",
+    "ticker": "9433.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "SoftBank Corp",
+    "ticker": "9434.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Seven & I Holdings",
+    "ticker": "3382.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Aeon",
+    "ticker": "8267.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Tokio Marine",
+    "ticker": "8766.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Mizuho Financial",
+    "ticker": "8411.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Samsung Electronics",
+    "ticker": "005930.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "SK Hynix",
+    "ticker": "000660.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "LG Energy Solution",
+    "ticker": "373220.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "Samsung Biologics",
+    "ticker": "207940.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "Hyundai Motor",
+    "ticker": "005380.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "Kia",
+    "ticker": "000270.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "POSCO Holdings",
+    "ticker": "005490.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "Celltrion",
+    "ticker": "068270.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "KB Financial",
+    "ticker": "105560.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "Shinhan Financial",
+    "ticker": "055550.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "LG Chem",
+    "ticker": "051910.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "Kakao",
+    "ticker": "035720.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "Naver",
+    "ticker": "035420.KS",
+    "exchange": "Seoul"
+  },
+  {
+    "name": "Singapore Airlines",
+    "ticker": "C6L.SI",
+    "exchange": "Singapore"
+  },
+  {
+    "name": "DBS Group",
+    "ticker": "D05.SI",
+    "exchange": "Singapore"
+  },
+  {
+    "name": "OCBC Bank",
+    "ticker": "O39.SI",
+    "exchange": "Singapore"
+  },
+  {
+    "name": "UOB",
+    "ticker": "U11.SI",
+    "exchange": "Singapore"
+  },
+  {
+    "name": "Wilmar International",
+    "ticker": "F34.SI",
+    "exchange": "Singapore"
+  },
+  {
+    "name": "CapitaLand Investment",
+    "ticker": "9CI.SI",
+    "exchange": "Singapore"
+  },
+  {
+    "name": "Jardine Matheson",
+    "ticker": "J36.SI",
+    "exchange": "Singapore"
+  },
+  {
+    "name": "Sea Limited",
+    "ticker": "SE",
+    "exchange": "NYSE"
+  },
+  {
+    "name": "Grab Holdings",
+    "ticker": "GRAB",
+    "exchange": "NASDAQ"
+  },
+  {
+    "name": "Reliance Industries",
+    "ticker": "RELIANCE.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Tata Consultancy Services",
+    "ticker": "TCS.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "HDFC Bank",
+    "ticker": "HDFCBANK.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Infosys",
+    "ticker": "INFY.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "ICICI Bank",
+    "ticker": "ICICIBANK.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Hindustan Unilever",
+    "ticker": "HINDUNILVR.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "ITC",
+    "ticker": "ITC.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "State Bank of India",
+    "ticker": "SBIN.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Bajaj Finance",
+    "ticker": "BAJFINANCE.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Wipro",
+    "ticker": "WIPRO.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "HCL Technologies",
+    "ticker": "HCLTECH.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Larsen & Toubro",
+    "ticker": "LT.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Axis Bank",
+    "ticker": "AXISBANK.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Maruti Suzuki",
+    "ticker": "MARUTI.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Tata Motors",
+    "ticker": "TATAMOTORS.NS",
+    "exchange": "Mumbai"
+  },
+  {
+    "name": "Emirates NBD",
+    "ticker": "ENBD.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "First Abu Dhabi Bank",
+    "ticker": "FAB.AE",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "DP World",
+    "ticker": "DPW.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "ADNOC Distribution",
+    "ticker": "ADNOCDIST.AE",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Emaar Properties",
+    "ticker": "EMAAR.AE",
+    "exchange": "Dubai"
+  },
+  {
+    "name": "Aldar Properties",
+    "ticker": "ALDAR.AE",
+    "exchange": "Abu Dhabi"
+  },
+  {
+    "name": "Bank Central Asia",
+    "ticker": "BBCA.JK",
+    "exchange": "Jakarta"
+  },
+  {
+    "name": "Bank Mandiri",
+    "ticker": "BMRI.JK",
+    "exchange": "Jakarta"
+  },
+  {
+    "name": "Bank Rakyat Indonesia",
+    "ticker": "BBRI.JK",
+    "exchange": "Jakarta"
+  },
+  {
+    "name": "Telkom Indonesia",
+    "ticker": "TLKM.JK",
+    "exchange": "Jakarta"
+  },
+  {
+    "name": "Astra International",
+    "ticker": "ASII.JK",
+    "exchange": "Jakarta"
+  },
+  {
+    "name": "Unilever Indonesia",
+    "ticker": "UNVR.JK",
+    "exchange": "Jakarta"
+  },
+  {
+    "name": "Vingroup",
+    "ticker": "VIC.VN",
+    "exchange": "Ho Chi Minh"
+  },
+  {
+    "name": "Vinhomes",
+    "ticker": "VHM.VN",
+    "exchange": "Ho Chi Minh"
+  },
+  {
+    "name": "Vietcombank",
+    "ticker": "VCB.VN",
+    "exchange": "Ho Chi Minh"
+  },
+  {
+    "name": "BIDV",
+    "ticker": "BID.VN",
+    "exchange": "Ho Chi Minh"
+  },
+  {
+    "name": "FPT Corporation",
+    "ticker": "FPT.VN",
+    "exchange": "Ho Chi Minh"
+  },
+  {
+    "name": "Tokyo Electron",
+    "ticker": "8035.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Advantest",
+    "ticker": "6857.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Lasertec",
+    "ticker": "6920.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Disco",
+    "ticker": "6146.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "SCREEN Holdings",
+    "ticker": "7735.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Kokusai Electric",
+    "ticker": "6525.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Sumco",
+    "ticker": "3436.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Renesas Electronics",
+    "ticker": "6723.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Tokyo Seimitsu",
+    "ticker": "7729.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Nidec",
+    "ticker": "6594.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Nitto Denko",
+    "ticker": "6988.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Hirose Electric",
+    "ticker": "6806.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Ibiden",
+    "ticker": "4062.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Hoya",
+    "ticker": "7741.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Mitsubishi Corporation",
+    "ticker": "8058.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Mitsui & Co",
+    "ticker": "8031.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Itochu",
+    "ticker": "8001.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Sumitomo Corporation",
+    "ticker": "8053.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Marubeni",
+    "ticker": "8002.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Toyota Tsusho",
+    "ticker": "8015.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Komatsu",
+    "ticker": "6301.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Kubota",
+    "ticker": "6326.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "SMC Corporation",
+    "ticker": "6273.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Mitsubishi Heavy Industries",
+    "ticker": "7011.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Shimano",
+    "ticker": "7309.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Takeda Pharmaceutical",
+    "ticker": "4502.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Daiichi Sankyo",
+    "ticker": "4568.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Chugai Pharmaceutical",
+    "ticker": "4519.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Terumo",
+    "ticker": "4543.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Astellas Pharma",
+    "ticker": "4503.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Unicharm",
+    "ticker": "8113.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Kao",
+    "ticker": "4452.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Shiseido",
+    "ticker": "4911.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Fujifilm Holdings",
+    "ticker": "4901.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Fujitsu",
+    "ticker": "6702.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Mitsubishi Electric",
+    "ticker": "6503.T",
+    "exchange": "Tokyo"
+  },
+  {
+    "name": "Oriental Land",
+    "ticker": "4661.T",
+    "exchange": "Tokyo"
+  }
 ]
