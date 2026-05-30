@@ -1,4 +1,4 @@
-/* watchlist.js | v1.9 | 2026-05-24 */
+/* watchlist.js | v2.0 | 2026-05-24 */
 const WATCHLIST_KEY = 'stock_watchlist';
 const CATEGORIES_KEY = 'stock_categories';
 
@@ -30,7 +30,7 @@ function addToWatchlist(data, verdict) {
   const list = getWatchlist();
   const p = data.price || {};
   const currency = p.currency || 'USD';
-  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','KRW':'₩','SGD':'S$','INR':'₹','AED':'AED '}[currency] || currency+' ';
+  const cs = {'USD':'$','EUR':'€','GBP':'£','CHF':'CHF ','CAD':'CA$','JPY':'¥','KRW':'₩','SGD':'S$','INR':'₹','AED':'AED ','SAR':'SAR ','QAR':'QAR '}[currency] || currency+' ';
   const now = new Date();
 
   const entry = {
