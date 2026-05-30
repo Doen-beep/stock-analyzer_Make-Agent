@@ -1,4 +1,6 @@
-/* api/openai-analysis.js | v1.6 | 2026-05-25 */
+/* api/openai-analysis.js | v1.7 | 2026-05-25 */
+
+export const config = { maxDuration: 60 };
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
