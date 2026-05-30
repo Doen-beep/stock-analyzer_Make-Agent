@@ -1,4 +1,4 @@
-/* api/openai-analysis.js | v1.7 | 2026-05-25 */
+/* api/openai-analysis.js | v1.8 | 2026-05-25 */
 
 export const config = { maxDuration: 60 };
 
@@ -140,11 +140,21 @@ export default async function handler(req, res) {
 
     // Flag truncation so the client can warn the user instead of showing a
     // half-written analysis with a blank verdict banner.
+    const reason = result.incomplete_details?.reason
+      || (msgBlock?.status === 'incomplete' ? 'message_incomplete' : null);
     const incomplete = result.status === 'incomplete'
       || msgBlock?.status === 'incomplete'
       || result.incomplete_details != null;
 
-    res.status(200).json({ text, incomplete: !!incomplete });
+    // Diagnostic visible dans les logs Vercel (Functions → Logs)
+    console.log('[openai-analysis]', JSON.stringify({
+      status: result.status,
+      reason,
+      textLen: text.length,
+      usage: result.usage || null,
+    }));
+
+    res.status(200).json({ text, incomplete: !!incomplete, reason });
 
   } catch(e) {
     res.status(500).json({ error: e.message });
