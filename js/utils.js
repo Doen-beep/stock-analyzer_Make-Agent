@@ -1,47 +1,127 @@
-/* utils.js | v1.1 | 2026-05-24 */
-const fmt  = (n, d=2) => n == null || isNaN(n) ? '—' : Number(n).toFixed(d);
-const fmtB = n => n == null ? '—' : (n/1e9 >= 1000 ? (n/1e12).toFixed(1)+'T' : (n/1e9).toFixed(1)+'B');
-const fmtM = n => n == null ? '—' : (n/1e6).toFixed(1)+'M';
-const pct  = n => n == null ? '—' : (n >= 0 ? '+' : '')+(n*100).toFixed(2)+'%';
-const cc   = n => n == null ? '' : n >= 0 ? 'up' : 'down';
+/* search.js | v1.3 | 2026-05-24   */
+let allCompanies = [];
+let searchOpen = false;
+let searchTimeout = null;
 
-function recBadge(k) {
-  if (!k) return '';
-  const m = {
-    buy: ['rec-buy','Achat'],
-    hold: ['rec-hold','Neutre'],
-    sell: ['rec-sell','Vente'],
-    'strong buy': ['rec-buy','Fort achat'],
-    'strong sell': ['rec-sell','Fort vente']
-  };
-  const [c, l] = m[k] || ['rec-hold', k];
-  return `<div class="rec-badge ${c}">${l}</div>`;
+// Charger les données immédiatement
+(async function loadData() {
+  try {
+    const [sp500, nasdaq, stoxx, euronext, asia, euronextParis, xetra, six, gulf] = await Promise.all([
+      fetch('data/sp500.json').then(r => r.json()),
+      fetch('data/nasdaq.json').then(r => r.json()),
+      fetch('data/stoxx600.json').then(r => r.json()),
+      fetch('data/euronext.json').then(r => r.json()),
+      fetch('data/asia.json').then(r => r.json()),
+      fetch('data/euronext-paris.json').then(r => r.json()),
+      fetch('data/xetra.json').then(r => r.json()),
+      fetch('data/six.json').then(r => r.json()),
+      fetch('data/gulf.json').then(r => r.json()),
+    ]);
+    const seen = new Set();
+    [...sp500, ...nasdaq, ...stoxx, ...euronext, ...asia, ...euronextParis, ...xetra, ...six, ...gulf].forEach(c => {
+      if (!seen.has(c.ticker)) { seen.add(c.ticker); allCompanies.push(c); }
+    });
+    console.log('Search data loaded:', allCompanies.length, 'companies');
+  } catch (e) {
+    console.warn('Erreur chargement données:', e);
+  }
+})();
+
+function initSearch() {
+  const input = document.getElementById('ticker');
+  const inputRow = document.querySelector('.input-row');
+  inputRow.style.position = 'relative';
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    clearTimeout(searchTimeout);
+    if (q.length < 2) { closeDropdown(); return; }
+    searchTimeout = setTimeout(() => doSearch(q), 150);
+  });
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeDropdown(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); navigateDropdown(1); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); navigateDropdown(-1); return; }
+    if (e.key === 'Enter') {
+      const active = document.querySelector('.search-item.active');
+      if (active) { active.click(); return; }
+      if (!searchOpen) analyze();
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.input-row')) closeDropdown();
+  });
+
+  console.log('initSearch called OK');
 }
 
-function rbar(lo, hi, cur) {
-  if (!lo || !hi || !cur) return '';
-  const p = Math.min(100, Math.max(0, ((cur-lo)/(hi-lo))*100));
-  return `
-    <div class="range-bar">
-      <div class="range-fill" style="width:${p}%"></div>
-      <div class="range-dot" style="left:${p}%"></div>
+function doSearch(q) {
+  const ql = q.toLowerCase();
+  const matches = allCompanies.filter(c =>
+    c.name.toLowerCase().includes(ql) || c.ticker.toLowerCase().includes(ql)
+  ).slice(0, 7);
+  console.log('Search:', q, '->', matches.length, 'results');
+  if (matches.length) showDropdown(matches);
+  else closeDropdown();
+}
+
+function showDropdown(matches) {
+  closeDropdown();
+  const inputRow = document.querySelector('.input-row');
+  const dd = document.createElement('div');
+  dd.id = 'searchDropdown';
+  dd.style.cssText = 'position:absolute;top:100%;left:0;right:0;z-index:9999;background:#16161f;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.5);';
+
+  dd.innerHTML = matches.map((c, i) => `
+    <div class="search-item" data-ticker="${c.ticker}" data-index="${i}"
+      style="padding:10px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:0.5px solid var(--border);">
+      <div>
+        <span style="font-family:var(--mono);font-size:13px;font-weight:500;color:#e8e6f0">${c.ticker}</span>
+        <span style="font-size:12px;color:#9990bb;margin-left:10px">${c.name}</span>
+      </div>
+      <span style="font-family:var(--mono);font-size:10px;color:#6b6880;letter-spacing:0.06em">${c.exchange}</span>
     </div>
-    <div class="range-labels"><span>$${fmt(lo)}</span><span>$${fmt(hi)}</span></div>`;
+  `).join('');
+
+  dd.querySelectorAll('.search-item').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      dd.querySelectorAll('.search-item').forEach(el => { el.classList.remove('active'); el.style.background = 'transparent'; });
+      item.classList.add('active');
+      item.style.background = 'rgba(124,106,247,0.12)';
+    });
+    item.addEventListener('mouseleave', () => {
+      item.classList.remove('active');
+      item.style.background = 'transparent';
+    });
+    item.addEventListener('click', () => selectTicker(item.dataset.ticker));
+  });
+
+  inputRow.appendChild(dd);
+  searchOpen = true;
 }
 
-function getRegion(ticker) {
-  if (ticker.endsWith('.PA')) return 'FR';   // Euronext Paris
-  if (ticker.endsWith('.L'))  return 'GB';   // London
-  if (ticker.endsWith('.DE')) return 'DE';   // Frankfurt
-  if (ticker.endsWith('.SW')) return 'CH';   // Suisse
-  if (ticker.endsWith('.AS')) return 'NL';   // Amsterdam
-  if (ticker.endsWith('.MI')) return 'IT';   // Milan
-  if (ticker.endsWith('.MC')) return 'ES';   // Madrid
-  if (ticker.endsWith('.BR')) return 'BE';   // Bruxelles
-  if (ticker.endsWith('.LS')) return 'PT';   // Lisbonne
-  if (ticker.endsWith('.TO')) return 'CA';   // Toronto
-  if (ticker.endsWith('.AX')) return 'AU';   // Australie
-  if (ticker.endsWith('.T'))  return 'JP';   // Tokyo
-  if (ticker.endsWith('.HK')) return 'HK';   // Hong Kong
-  return 'US'; // défaut
+function navigateDropdown(dir) {
+  const items = [...document.querySelectorAll('.search-item')];
+  if (!items.length) return;
+  const idx = items.findIndex(el => el.classList.contains('active'));
+  items.forEach(el => { el.classList.remove('active'); el.style.background = 'transparent'; });
+  let next = idx + dir;
+  if (next < 0) next = items.length - 1;
+  if (next >= items.length) next = 0;
+  items[next].classList.add('active');
+  items[next].style.background = 'rgba(124,106,247,0.12)';
+}
+
+function selectTicker(ticker) {
+  document.getElementById('ticker').value = ticker;
+  closeDropdown();
+  analyze();
+}
+
+function closeDropdown() {
+  const d = document.getElementById('searchDropdown');
+  if (d) d.remove();
+  searchOpen = false;
 }
