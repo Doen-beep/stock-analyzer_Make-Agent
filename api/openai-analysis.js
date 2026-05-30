@@ -1,4 +1,4 @@
-/* api/openai-analysis.js | v1.5 | 2026-05-25 */
+/* api/openai-analysis.js | v1.6 | 2026-05-25 */
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'gpt-4.1',
-        max_output_tokens: 8000,
+        max_output_tokens: 16000,
         tools: [{ type: 'web_search_preview' }],
         instructions: SYSTEM_PROMPT,
         input: `Analyze ${ticker} following the 5-phase Buffett methodology.\n\nReal-time market data:\n${JSON.stringify(marketData, null, 2)}`,
@@ -136,7 +136,13 @@ export default async function handler(req, res) {
 
     if (!text) throw new Error('Empty response from OpenAI');
 
-    res.status(200).json({ text });
+    // Flag truncation so the client can warn the user instead of showing a
+    // half-written analysis with a blank verdict banner.
+    const incomplete = result.status === 'incomplete'
+      || msgBlock?.status === 'incomplete'
+      || result.incomplete_details != null;
+
+    res.status(200).json({ text, incomplete: !!incomplete });
 
   } catch(e) {
     res.status(500).json({ error: e.message });
