@@ -1,4 +1,4 @@
-/* markdown.js | v2.0 | 2026-05-24 */
+/* markdown.js | v2.1 | 2026-05-24 */
 function renderMarkdown(text) {
   if (!text) return '';
   const lines = text.split('\n');
@@ -215,20 +215,23 @@ function extractVerdict(text) {
   }
 
   const target = etpMatch ? etpMatch[1].trim() : '—';
+  const iv = ivMatch ? ivMatch[1].trim() : '—';
 
-  // Scorecard /5
+  // Scorecard /5 — also collect numeric scores for the watchlist
+  const scores = {};
   const scoreMap = [
-    ['Business Quality', 'sBusiness'],
-    ['Moat', 'sMoat'],
-    ['Financials', 'sFinance'],
-    ['Management', 'sManagement'],
-    ['Valuation', 'sValuation'],
+    ['Business Quality', 'sBusiness', 'business'],
+    ['Moat', 'sMoat', 'moat'],
+    ['Financials', 'sFinance', 'financials'],
+    ['Management', 'sManagement', 'management'],
+    ['Valuation', 'sValuation', 'valuationScore'],
   ];
-  for (const [key, id] of scoreMap) {
+  for (const [key, id, prop] of scoreMap) {
     // Tolerate bold markers (**Valuation**), extra spaces, and "4 / 5" spacing.
     const re = new RegExp('\\**\\s*' + key + '\\s*\\**\\s*\\|\\s*\\**\\s*(\\d(?:\\.\\d)?)\\s*\\/\\s*5', 'i');
     const m = text.match(re);
     if (m) {
+      scores[prop] = m[1];
       const el = document.getElementById(id);
       if (el) {
         const score = parseFloat(m[1]);
@@ -236,16 +239,24 @@ function extractVerdict(text) {
         const stars = '★'.repeat(full) + '☆'.repeat(5 - full);
         el.innerHTML = '<span style="color:#f5c842;font-size:13px;">' + stars + '</span><br><span style="font-size:11px;">' + m[1] + '/5</span>';
       }
+    } else {
+      scores[prop] = '—';
     }
   }
+
+  // Overall score (separate row, often bold)
+  const overallMatch = text.match(/\**\s*Overall\s*\**\s*\|\s*\**\s*(\d(?:\.\d)?)\s*\/\s*5/i);
+  const overall = overallMatch ? overallMatch[1] : '—';
 
   banner.style.display = 'block';
 
   return {
-    quality: '—',
     valuation: document.getElementById('vValuation')?.textContent?.trim() || '—',
     decision: document.getElementById('vDecision')?.textContent?.trim() || '—',
+    intrinsicValue: iv,
     target: target,
+    scores: scores,
+    overall: overall,
   };
 }
 
