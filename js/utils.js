@@ -1,7 +1,7 @@
-/* utils.js | v1.0 | 2026-05-24 */
+/* utils.js | v1.1 | 2026-05-24 */
 const fmt  = (n, d=2) => n == null || isNaN(n) ? '—' : Number(n).toFixed(d);
-const fmtB = n => n == null ? '—' : (n/1e9 >= 1000 ? (n/1e12).toFixed(1)+' T$' : (n/1e9).toFixed(1)+' Mrd$');
-const fmtM = n => n == null ? '—' : (n/1e6).toFixed(1)+' M';
+const fmtB = n => n == null ? '—' : (n/1e9 >= 1000 ? (n/1e12).toFixed(1)+'T' : (n/1e9).toFixed(1)+'B');
+const fmtM = n => n == null ? '—' : (n/1e6).toFixed(1)+'M';
 const pct  = n => n == null ? '—' : (n >= 0 ? '+' : '')+(n*100).toFixed(2)+'%';
 const cc   = n => n == null ? '' : n >= 0 ? 'up' : 'down';
 
