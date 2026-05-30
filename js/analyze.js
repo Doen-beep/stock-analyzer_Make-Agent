@@ -1,4 +1,4 @@
-/* analyze.js | v2.9 | 2026-05-24 */
+/* analyze.js | v3.0 | 2026-05-24 */
 let lastData = null;
 
 async function analyze() {
@@ -239,7 +239,14 @@ async function gptAnalyze() {
     const fullText = json.text || '';
     if (!fullText) throw new Error('Empty response from OpenAI');
 
-    aiText.innerHTML = renderMarkdown(fullText);
+    let rendered = renderMarkdown(fullText);
+    if (json.incomplete) {
+      rendered = '<div style="border:1px solid var(--red);border-radius:8px;padding:10px 14px;' +
+        'margin-bottom:12px;font-size:13px;color:var(--red);">⚠️ This analysis was cut off before ' +
+        'finishing (output length limit). The verdict below may be incomplete — try again for the full report.</div>' +
+        rendered;
+    }
+    aiText.innerHTML = rendered;
     if (typeof updateScorecard === 'function') updateScorecard(fullText);
     window._lastVerdict = extractVerdict(fullText);
     const wlBtn = document.getElementById('wlBtn');
